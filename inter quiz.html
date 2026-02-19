@@ -32,7 +32,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 @keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(40px,30px) scale(1.08)}}
 
 /* ── APP SHELL ── */
-.app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 1rem 5rem}
+.app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 1rem 2rem}
 .wrap{width:100%;max-width:900px}
 
 /* ── TOPBAR ── */
@@ -202,13 +202,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .prog-meta .frac{color:var(--text);font-weight:800}
 .prog-track{height:5px;background:var(--card2);border-radius:5px;overflow:hidden}
 .prog-bar{height:100%;border-radius:5px;background:var(--grad);transition:width .5s cubic-bezier(.4,0,.2,1)}
-.dot-nav{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.55rem}
-.dn-dot{width:9px;height:9px;border-radius:50%;background:var(--card2);border:1.5px solid var(--b2);cursor:pointer;transition:all .22s}
-.dn-dot:hover{transform:scale(1.5);border-color:var(--acc2)}
-.dn-dot.cur{background:var(--acc);border-color:var(--acc);transform:scale(1.5);box-shadow:0 0 7px rgba(91,106,240,.5)}
-.dn-dot.ok{background:var(--green);border-color:var(--green)}
-.dn-dot.bad{background:var(--red);border-color:var(--red)}
-.dn-dot.skip{background:var(--muted);border-color:var(--muted)}
+.qnav-sidebar{display:none;grid-template-columns:repeat(15,1fr);gap:4px;background:var(--card);border:1px solid var(--b1);border-radius:10px;padding:6px 8px;margin-bottom:.8rem;justify-items:center}
+.dn-dot{width:100%;max-width:36px;height:30px;border-radius:6px;background:var(--card2);border:1.5px solid var(--b2);cursor:pointer;transition:all .22s;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--sub)}
+.dn-dot:hover{border-color:var(--acc2);background:rgba(91,106,240,.1);transform:scale(1.08)}
+.dn-dot.cur{background:var(--acc);border-color:var(--acc);color:#fff;box-shadow:0 0 10px rgba(91,106,240,.5);transform:scale(1.08)}
+.dn-dot.ok{background:rgba(16,217,126,.15);border-color:var(--green);color:var(--green)}
+.dn-dot.bad{background:rgba(255,77,109,.15);border-color:var(--red);color:var(--red)}
+.dn-dot.skip{background:rgba(148,163,184,.1);border-color:var(--muted);color:var(--muted)}
 
 /* question card */
 .q-card{background:var(--card2);border:1px solid var(--b2);border-radius:var(--r2);padding:1.6rem 1.8rem;margin-bottom:.9rem}
@@ -392,6 +392,8 @@ user-select:none;
   .dash-grid{grid-template-columns:1fr}
   .stats-overview{grid-template-columns:1fr 1fr}
   .perf-grid{grid-template-columns:1fr}
+  .qnav-sidebar{grid-template-columns:repeat(15,1fr);padding:4px;gap:2px}
+  .dn-dot{height:24px;font-size:.55rem;border-radius:4px}
 }
 </style>
 </head>
@@ -450,14 +452,8 @@ user-select:none;
               </div>
               <div class="field-error" id="li-pass-err">Please enter your password</div>
             </div>
-            <div class="field-error" id="li-main-err" style="display:none;font-size:.82rem;text-align:center">❌ Invalid credentials. Try demo accounts below.</div>
+            <div class="field-error" id="li-main-err" style="display:none;font-size:.82rem;text-align:center">❌ Invalid credentials.</div>
             <button class="btn btn-primary btn-full" id="btn-login">Sign In →</button>
-            <div class="divider">or use demo account</div>
-            <div class="demo-row">
-              <div class="demo-chip" data-u="student1" data-p="pass123">👤 student1</div>
-              <div class="demo-chip" data-u="testuser" data-p="quiz456">👤 testuser</div>
-              <div class="demo-chip" data-u="admin" data-p="admin123">👑 admin</div>
-            </div>
           </div>
           <!-- REGISTER -->
           <div class="form-section" id="form-register">
@@ -605,8 +601,8 @@ user-select:none;
       <div class="prog-wrap">
         <div class="prog-meta"><span class="frac" id="pq-frac">1/10</span><span id="pq-pct">0%</span></div>
         <div class="prog-track"><div class="prog-bar" id="prog-bar"></div></div>
-        <div class="dot-nav" id="dot-nav"></div>
       </div>
+      <div class="qnav-sidebar" id="dot-nav"></div>
       <div class="q-card">
         <div class="q-tags">
           <span class="qtag qtag-diff" id="qt-diff">🌱 Easy</span>
@@ -658,6 +654,10 @@ user-select:none;
           <div class="sbox sv-bad"><div class="sv" id="r-wrg">0</div><div class="sl">Wrong</div></div>
           <div class="sbox sv-skip"><div class="sv" id="r-skp">0</div><div class="sl">Skipped</div></div>
           <div class="sbox sv-pts"><div class="sv" id="r-pts">0</div><div class="sl">Points</div></div>
+          <div class="sbox" style="border-color:var(--p2)"><div class="sv" id="r-time" style="color:var(--p2)">0:00</div><div class="sl">Time Taken</div></div>
+          <div class="sbox" style="border-color:var(--amber)"><div class="sv" id="r-best-streak" style="color:var(--amber)">0</div><div class="sl">Best Streak</div></div>
+          <div class="sbox" style="border-color:#a78bfa"><div class="sv" id="r-start-lvl" style="color:#a78bfa">—</div><div class="sl">Start Level</div></div>
+          <div class="sbox" style="border-color:#f472b6"><div class="sv" id="r-end-lvl" style="color:#f472b6">—</div><div class="sl">Final Level</div></div>
         </div>
         <div class="section-label">Category Breakdown</div>
         <div class="bd-list" id="bd-list"></div>
@@ -1039,6 +1039,9 @@ function show(id){
   const el=document.getElementById(id);
   el.style.display='block';
   requestAnimationFrame(()=>el.classList.add('active'));
+  // Show sidebar only on quiz screen
+  const nav=document.getElementById('dot-nav');
+  if(nav) nav.style.display=(id==='s-quiz')?'grid':'none';
 }
 
 // ══════════════════════════════════════════════════════
@@ -1398,6 +1401,7 @@ function initQuiz(){
   for(let i=0;i<S.totalQs;i++){
     const d=document.createElement('div');
     d.className='dn-dot'; d.dataset.i=i;
+    d.textContent=i+1;
     d.addEventListener('click',()=>jumpTo(i));
     dn.appendChild(d);
   }
@@ -1507,12 +1511,12 @@ function updateDiffBadge(){
 function updateDots(){
   document.querySelectorAll('.dn-dot').forEach((d,i)=>{
     d.className='dn-dot';
-    if(i===S.idx){ d.classList.add('cur'); return; }
+    if(i===S.idx){ d.classList.add('cur'); d.textContent=i+1; return; }
     const a=S.ans[i];
-    if(!a) return;
-    if(a.skipped) d.classList.add('skip');
-    else if(a.ok) d.classList.add('ok');
-    else d.classList.add('bad');
+    if(!a){ d.textContent=i+1; return; }
+    if(a.skipped){ d.classList.add('skip'); d.textContent='—'; }
+    else if(a.ok){ d.classList.add('ok'); d.textContent='✓'; }
+    else { d.classList.add('bad'); d.textContent='✗'; }
   });
 }
 
@@ -1701,32 +1705,59 @@ function autoTimeout(){
   // Lock options but DO NOT highlight correct answer
   renderOptsLocked(q, false);
   updateDots();
-  hideFeedback();
+  showFeedback(S.ans[S.idx],q,0);
   hideExplain();
-  // Auto-move immediately (1s brief flash then next)
+  // Auto-move after showing feedback
   const isLast=S.idx>=S.totalQs-1;
-  // Show a non-intrusive "Time's up" flash on timer box only
   document.getElementById('timer-box').style.background='rgba(255,77,109,.25)';
   setTimeout(()=>{
     document.getElementById('timer-box').style.background='';
     if(isLast){ finishQuiz(); }
-    else { S.idx++; loadQ(); }
-  },800);
+    else { pickNextQ(); S.idx++; loadQ(); }
+  },1500);
 }
 
 // ── FEEDBACK ──────────────────────────────────────────
+const CORRECT_MSGS=[
+  'Brilliant! You nailed it! 🎯','Awesome! Keep rocking! 🚀','Superb answer! 🌟','You\'re on fire! 🔥',
+  'Genius move! 🧠','Spot on! Well done! 👏','Excellent! That\'s the way! ⭐','Perfect pick! 💎',
+  'Sharp mind! Keep going! ⚡','Outstanding! You know this! 💪','Crushed it! Amazing! 🏆','Bravo! Nailed it! 🎉',
+  'Right on target! 🎯','Impressive! Keep it up! 🌈','Smart answer! 🦉','You make it look easy! 😎',
+  'Textbook perfect! 📖','Knowledge is power! 💡','Top-notch answer! 🥇','You\'re unstoppable! 🦁'
+];
+const WRONG_MSGS=[
+  'Not quite — you\'ll get the next one! 💪','Close! Keep pushing forward! 🏃','Mistakes teach us! Learn & grow! 🌱',
+  'Don\'t worry, keep trying! 🌟','It\'s okay! Every error is a lesson! 📚','Chin up! You\'re still in the game! 🎮',
+  'Almost there! Stay focused! 🎯','Tough one! You\'ll crack it next time! 🔓','Keep going — persistence wins! 🏅',
+  'No worries! Great learners make mistakes! 🧠','That was tricky! Stay strong! 💎','Not this time — but you\'re improving! 📈',
+  'Hang in there! Success is near! 🌅','Shake it off and move forward! 🔄','One step back, two steps forward! 👣',
+  'Stay confident! You\'re learning! ✨','Keep your head up! Champions bounce back! 🏆','Wrong today, right tomorrow! 🌈',
+  'It\'s a marathon, not a sprint! 🏁','Review this one later — you\'ll master it! 🔑'
+];
+const TIMEOUT_MSGS=[
+  'Time flies! Be quicker next time! ⏰','Almost! A little faster and you\'ll get it! 🏃',
+  'Clock ran out — trust your instincts! ⚡','Don\'t overthink — go with your gut! 🎯',
+  'Speed comes with practice! Keep going! 🔥','Tick tock! Read faster next time! 📖',
+  'Time\'s up — but don\'t let it stop you! 💪','Quicker decisions come with practice! 🧠',
+  'Racing against time — you\'ll improve! 🏎️','Time management is a skill — you\'re building it! ⏳'
+];
 function showFeedback(a,q,pts){
   const fb=document.getElementById('feedback');
   if(!a||a.skipped){ fb.className='feedback'; return; }
-  if(a.timedOut){ return; } // already set in autoTimeout
+  const rnd=arr=>arr[Math.floor(Math.random()*arr.length)];
+  if(a.timedOut){
+    fb.className='feedback bad show';
+    fb.innerHTML=`<div class="fb-icon">⏱️</div><div class="fb-body"><strong>Time\'s Up!</strong><br><span style="font-size:.82rem;opacity:.85">${rnd(TIMEOUT_MSGS)}</span></div>`;
+    return;
+  }
   if(a.ok){
     fb.className='feedback ok show';
-    fb.innerHTML=`<div class="fb-icon">✅</div><div class="fb-body"><strong>Correct! +${a.pts} pts</strong>${S.streak>=3?' 🔥 '+S.streak+'× Streak!':''}</div>`;
+    fb.innerHTML=`<div class="fb-icon">✅</div><div class="fb-body"><strong>Correct! +${a.pts} pts</strong>${S.streak>=3?' 🔥 '+S.streak+'× Streak!':''}<br><span style="font-size:.82rem;opacity:.85">${rnd(CORRECT_MSGS)}</span></div>`;
   } else {
     const q2=S.qs[S.idx];
     const correctStr=a.correct.map(ci=>q2.o[ci]).join(' / ');
     fb.className='feedback bad show';
-    fb.innerHTML=`<div class="fb-icon">❌</div><div class="fb-body"><strong>Wrong!</strong> Correct: <strong>${correctStr}</strong></div>`;
+    fb.innerHTML=`<div class="fb-icon">❌</div><div class="fb-body"><strong>Wrong!</strong> Correct: <strong>${correctStr}</strong><br><span style="font-size:.82rem;opacity:.85">${rnd(WRONG_MSGS)}</span></div>`;
   }
 }
 function hideFeedback(){ document.getElementById('feedback').className='feedback'; }
@@ -1802,31 +1833,111 @@ function showResults(cor,wrg,skp,acc){
     'You are a true champion! Nothing can stop you! 🌟',
     'Absolute genius! Your preparation is paying off! 🧠',
     'You crushed it! Ready for the next challenge? 🚀',
-    'Incredible! You\'ve mastered this topic completely! 👑'
+    'Incredible! You\'ve mastered this topic completely! 👑',
+    'Flawless victory! You\'re destined for greatness! 🎖️',
+    'Perfection personified! Take a bow, superstar! 🌠',
+    'You nailed every single one! What a performance! 💎',
+    'Zero mistakes — your dedication is unmatched! 🏅',
+    'A perfect score! You\'re truly exam-ready! 📜',
+    'Legendary performance! The topper is here! 👏',
+    'Wow! Not a single error — you\'re unstoppable! 🦁',
+    'Pure excellence! Your knowledge is outstanding! 🔬',
+    'You aced it completely! Time to celebrate! 🎊',
+    'Mind-blowing! 100% accuracy is no joke! 🤯',
+    'Supreme mastery! Nothing more to prove! 🏰',
+    'Textbook perfect! You\'re an inspiration! 📖',
+    'You made it look effortless! True talent! 🎪',
+    'Standing ovation for this flawless run! 🎭',
+    'Unbreakable! You\'ve conquered this exam! ⚔️',
+    'The gold standard! Everyone should learn from you! 🥇'
   ];
   const tips80=[
-    'Your hard work is showing — almost perfect! Keep going! 🔥',
+    'Your hard work is showing — almost perfect! 🔥',
     'Impressive knowledge! You\'re exam-ready! 💯',
     'Fantastic result! Just a few more to master! ⭐',
-    'You\'re shining bright! Greatness is within reach! ✨'
+    'You\'re shining bright! Greatness is within reach! ✨',
+    'So close to perfection! You\'re nearly there! 🎯',
+    'Brilliant performance! Your efforts are paying off! 🌟',
+    'Outstanding work! A little more polish and you\'ll be perfect! 💪',
+    'You\'re in the top league! Keep this momentum going! 🚀',
+    'Superb accuracy! Your knowledge base is strong! 🏛️',
+    'Wonderful score! You\'re among the best! 🥈',
+    'Exceptional! Just iron out the small gaps! 🔧',
+    'You\'re dominating this subject! Keep it up! 👊',
+    'Almost there! Victory is just around the corner! 🏁',
+    'Your consistency is remarkable! Stay focused! 🎯',
+    'Impressive! You\'re performing like a champion! 🏆',
+    'Rock solid performance! Be proud of yourself! 🪨',
+    'You\'re firing on all cylinders! Amazing! 🔥',
+    'Top-tier score! The finish line is in sight! 🏃‍♂️',
+    'Magnificent! Your preparation strategy is working! 📊',
+    'Nearly flawless! Success is your destiny! 🌅'
   ];
   const tips60=[
-    'Good effort! Review the tricky ones and you\'ll ace it next time! 📝',
+    'Good effort! Review the tricky ones and ace it next time! 📝',
     'You\'re on the right track — consistency is key! 🎯',
     'Solid foundation! A little more practice and you\'ll soar! 🦅',
-    'Nice work! Focus on the mistakes and turn them into strengths! 💪'
+    'Nice work! Turn mistakes into strengths! 💪',
+    'You\'re getting there! Every quiz makes you smarter! 🧠',
+    'Above average! Push a little harder for excellence! 📈',
+    'Well played! Focus on weak areas and watch yourself grow! 🌱',
+    'Decent score! You have the potential for much more! 💎',
+    'Good start! Revise the wrong ones and retry! 🔄',
+    'You\'re building momentum! Don\'t stop now! 🏗️',
+    'Halfway to mastery! Keep climbing! 🧗',
+    'Not bad at all! A few more rounds will make you shine! ✨',
+    'Your effort is commendable! Success loves persistence! 🏅',
+    'Progress is visible! Keep pushing your limits! 🚀',
+    'You\'re in the growth zone! This is where champions are made! 🌿',
+    'Steady progress! Review explanations and come back stronger! 📚',
+    'You\'ve got the basics down! Time to level up! ⬆️',
+    'Nice try! Each attempt sharpens your skills! ⚡',
+    'You\'re capable of more — believe and achieve! 🌈',
+    'Good foundation! Polish the edges and you\'ll excel! 🎓'
   ];
   const tips40=[
     'Don\'t worry — every expert was once a beginner! 🌱',
     'Progress is progress, no matter how small. Keep pushing! 🏃',
-    'Study the explanations below — they\'re your secret weapon! 🔑',
-    'Believe in yourself! You\'re learning with every attempt! 📚'
+    'Study the explanations — they\'re your secret weapon! 🔑',
+    'Believe in yourself! You\'re learning with every attempt! 📚',
+    'Rome wasn\'t built in a day. Keep building! 🏛️',
+    'You\'re planting seeds of knowledge. They will bloom! 🌻',
+    'Stay curious! Questions are the path to answers! ❓',
+    'Don\'t compare your chapter 1 to someone\'s chapter 20! 📖',
+    'Every attempt is a step closer to your goal! 👣',
+    'You have the courage to try — that\'s half the battle! ⚔️',
+    'Knowledge is a journey, not a destination! 🛤️',
+    'Small progress is still progress. Be proud! 🎖️',
+    'Focus on what you learned, not what you missed! 🔍',
+    'The expert in anything was once a beginner! 🌅',
+    'Your potential is unlimited. Keep going! 🌊',
+    'Mistakes are proof that you are trying! ✅',
+    'Review, revise, retry — the winning formula! 🔄',
+    'Tough topics need more time. Be patient with yourself! ⏳',
+    'You\'re braver than you believe and stronger than you seem! 🦊',
+    'This is just the beginning of your journey! 🛫'
   ];
   const tipsLow=[
     'Failure is the stepping stone to success — never give up! 🔥',
     'The only real failure is not trying again. You\'ve got this! 💪',
-    'Champions are made through practice. Review and come back stronger! 🏆',
-    'Every wrong answer is a lesson learned. Your time will come! 🌈'
+    'Champions are made through practice. Come back stronger! 🏆',
+    'Every wrong answer is a lesson learned. Your time will come! 🌈',
+    'Fall seven times, stand up eight! You\'re a warrior! ⚔️',
+    'Difficult roads lead to beautiful destinations! 🏔️',
+    'It\'s not about how hard you fall — it\'s about how you rise! 🦅',
+    'Edison failed 1000 times before the light bulb. Keep trying! 💡',
+    'Your determination is your greatest strength! 💎',
+    'Today\'s struggle is tomorrow\'s strength! 🌟',
+    'Don\'t let one bad score define you. You\'re more than this! 🌠',
+    'Winners never quit, and quitters never win! 🏅',
+    'The comeback is always stronger than the setback! 🔄',
+    'Believe you can and you\'re halfway there! 🌉',
+    'Success is not final, failure is not fatal — courage matters! 🦁',
+    'Stars can\'t shine without darkness. Keep going! ⭐',
+    'You\'re tougher than this challenge. Prove it! 🥊',
+    'Every master was once a disaster. Keep learning! 🎓',
+    'Pain is temporary, knowledge is forever! 📖',
+    'Your future self will thank you for not giving up today! 🙏'
   ];
   const pick=arr=>arr[Math.floor(Math.random()*arr.length)];
   if(acc===100){emoji='🏆';title='Perfect Score!';sub=pick(tips100)}
@@ -1843,6 +1954,19 @@ function showResults(cor,wrg,skp,acc){
   document.getElementById('r-wrg').textContent=wrg;
   document.getElementById('r-skp').textContent=skp;
   document.getElementById('r-pts').textContent=S.score;
+
+  // Time taken
+  const totalSec=S.timeTaken.slice(0,S.qs.length).reduce((a,b)=>a+b,0);
+  const mins=Math.floor(totalSec/60);
+  const secs=totalSec%60;
+  document.getElementById('r-time').textContent=mins+':'+(secs<10?'0':'')+secs;
+
+  // Best streak & level journey
+  document.getElementById('r-best-streak').textContent=S.bestStreak;
+  const startLvl=S.diffHistory.length?S.diffHistory[0]:1;
+  const endLvl=S.level;
+  document.getElementById('r-start-lvl').textContent=LEVEL_ICONS[startLvl]+' '+LEVEL_NAMES[startLvl];
+  document.getElementById('r-end-lvl').textContent=LEVEL_ICONS[endLvl]+' '+LEVEL_NAMES[endLvl];
 
   // ring
   const ring=document.getElementById('ring-fg');
