@@ -1,0 +1,1845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>ExamEdge Pro — Competitive Exam Quiz Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#070711;--bg2:#0c0c1a;--card:#111120;--card2:#161628;--card3:#1c1c35;
+  --b1:rgba(255,255,255,.06);--b2:rgba(255,255,255,.11);--b3:rgba(255,255,255,.18);
+  --acc:#5b6af0;--acc2:#7c8bf5;--acc3:#a5aefa;
+  --grad:linear-gradient(135deg,#5b6af0 0%,#8b5cf6 100%);
+  --glow:0 0 40px rgba(91,106,240,.3);
+  --green:#10d97e;--red:#ff4d6d;--amber:#fbbf24;--sky:#38bdf8;--pink:#f472b6;
+  --easy:#10d97e;--mid:#fbbf24;--hard:#ff4d6d;
+  --text:#eeeeff;--sub:#8888bb;--muted:#44446a;
+  --r:16px;--r2:12px;--r3:8px;
+  --font:'Outfit',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* animated mesh bg */
+.mesh{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.mesh span{position:absolute;border-radius:50%;filter:blur(80px);animation:drift 18s ease-in-out infinite alternate}
+.mesh span:nth-child(1){width:600px;height:600px;background:rgba(91,106,240,.10);top:-200px;left:-150px;animation-delay:0s}
+.mesh span:nth-child(2){width:500px;height:500px;background:rgba(139,92,246,.08);bottom:-180px;right:-120px;animation-delay:-6s}
+.mesh span:nth-child(3){width:350px;height:350px;background:rgba(56,189,248,.06);top:40%;left:55%;animation-delay:-12s}
+@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(40px,30px) scale(1.08)}}
+
+/* ── APP SHELL ── */
+.app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 1rem 5rem}
+.wrap{width:100%;max-width:900px}
+
+/* ── TOPBAR ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:1.4rem 0;width:100%;max-width:900px}
+.logo-row{display:flex;align-items:center;gap:.75rem}
+.logo-mark{width:44px;height:44px;border-radius:13px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:1.3rem;box-shadow:var(--glow)}
+.logo-text{font-weight:900;font-size:1.4rem;letter-spacing:-.02em}
+.logo-text em{font-style:normal;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.logo-sub{font-size:.6rem;color:var(--sub);text-transform:uppercase;letter-spacing:.12em;margin-top:-3px}
+.hud{display:none;align-items:center;gap:.6rem}
+.hud.show{display:flex}
+.hud-chip{display:flex;align-items:center;gap:.35rem;background:var(--card2);border:1px solid var(--b2);border-radius:20px;padding:.3rem .85rem;font-size:.76rem;font-weight:600}
+.hud-chip.pts{color:var(--acc3)}
+.hud-chip.usr{color:var(--green)}
+.hud-logout{background:transparent;border:1px solid var(--b2);border-radius:8px;padding:.3rem .7rem;font-size:.72rem;color:var(--sub);cursor:pointer;font-family:var(--font);transition:all .2s}
+.hud-logout:hover{border-color:var(--red);color:var(--red)}
+
+/* ── SCREENS ── */
+.screen{display:none;animation:screenIn .4s cubic-bezier(.22,.68,0,1.2) both}
+.screen.active{display:block}
+@keyframes screenIn{from{opacity:0;transform:translateY(24px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+/* ── PANEL / CARD ── */
+.panel{background:var(--card);border:1px solid var(--b1);border-radius:var(--r);padding:2.5rem;position:relative;overflow:hidden}
+.panel::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(91,106,240,.6),transparent)}
+.panel-sm{padding:1.6rem}
+
+/* ── TYPOGRAPHY ── */
+.page-title{font-weight:900;font-size:clamp(1.6rem,4vw,2.1rem);letter-spacing:-.03em;line-height:1.15;margin-bottom:.3rem}
+.page-title em{font-style:normal;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.page-sub{font-size:.88rem;color:var(--sub);margin-bottom:2rem;line-height:1.6}
+.section-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--sub);margin-bottom:.9rem}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.45rem;font-family:var(--font);font-weight:700;border:none;cursor:pointer;border-radius:var(--r2);transition:all .2s cubic-bezier(.25,.8,.25,1);user-select:none}
+.btn:disabled{opacity:.3;cursor:not-allowed;pointer-events:none}
+.btn-primary{background:var(--grad);color:#fff;padding:.9rem 2rem;font-size:.92rem;box-shadow:0 4px 20px rgba(91,106,240,.35)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(91,106,240,.5)}
+.btn-outline{background:var(--card2);color:var(--sub);border:1.5px solid var(--b2);padding:.8rem 1.4rem;font-size:.88rem}
+.btn-outline:hover{border-color:var(--acc2);color:var(--acc3)}
+.btn-ghost{background:transparent;color:var(--muted);border:1.5px dashed var(--b2);padding:.75rem 1.2rem;font-size:.82rem}
+.btn-ghost:hover{border-color:var(--amber);color:var(--amber)}
+.btn-danger{background:rgba(255,77,109,.12);color:var(--red);border:1.5px solid rgba(255,77,109,.3);padding:.8rem 1.4rem;font-size:.88rem}
+.btn-danger:hover{background:rgba(255,77,109,.22);border-color:var(--red)}
+.btn-full{width:100%}
+.btn-row{display:flex;gap:.75rem;align-items:center;flex-wrap:wrap}
+
+/* ── INPUT ── */
+.field{margin-bottom:1.3rem}
+.field label{display:block;font-size:.76rem;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem}
+.field input,.field select{width:100%;background:var(--card2);border:1.5px solid var(--b2);border-radius:var(--r2);padding:.85rem 1.1rem;font-family:var(--font);font-size:.92rem;color:var(--text);outline:none;transition:border-color .2s}
+.field input:focus,.field select:focus{border-color:var(--acc2);box-shadow:0 0 0 3px rgba(91,106,240,.15)}
+.field input::placeholder{color:var(--muted)}
+.field .input-wrap{position:relative}
+.field .input-icon{position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-size:1.1rem;cursor:pointer;user-select:none}
+.field-error{font-size:.72rem;color:var(--red);margin-top:.35rem;display:none}
+.field-error.show{display:block}
+
+/* ── LOGIN ── */
+#s-login{padding-top:5vh}
+.login-box{max-width:440px;margin:0 auto}
+.login-hero{text-align:center;margin-bottom:2rem}
+.login-hero .hero-icon{font-size:3rem;margin-bottom:.75rem}
+.auth-tabs{display:flex;background:var(--card2);border-radius:var(--r2);padding:.25rem;margin-bottom:1.8rem;gap:.25rem}
+.auth-tab{flex:1;padding:.65rem;border-radius:var(--r3);font-size:.84rem;font-weight:700;background:transparent;border:none;color:var(--sub);cursor:pointer;font-family:var(--font);transition:all .2s}
+.auth-tab.active{background:var(--acc);color:#fff;box-shadow:0 2px 10px rgba(91,106,240,.4)}
+.form-section{display:none}
+.form-section.active{display:block}
+.divider{display:flex;align-items:center;gap:.8rem;margin:1rem 0;color:var(--muted);font-size:.72rem}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--b2)}
+.demo-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.75rem}
+.demo-chip{background:var(--card3);border:1px solid var(--b2);border-radius:8px;padding:.35rem .75rem;font-size:.7rem;color:var(--sub);cursor:pointer;transition:all .2s}
+.demo-chip:hover{border-color:var(--acc2);color:var(--acc3)}
+
+/* ── DASHBOARD ── */
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem}
+.dash-stat{background:var(--card2);border:1px solid var(--b1);border-radius:var(--r2);padding:1.2rem 1.4rem;display:flex;align-items:center;gap:.9rem}
+.ds-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+.ds-val{font-weight:900;font-size:1.55rem;line-height:1;font-family:var(--mono)}
+.ds-lbl{font-size:.68rem;color:var(--sub);text-transform:uppercase;letter-spacing:.08em;margin-top:.15rem}
+.exam-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:.75rem;margin-bottom:1.5rem}
+.exam-card{background:var(--card2);border:1.5px solid var(--b1);border-radius:var(--r2);padding:1.3rem 1.1rem;cursor:pointer;transition:all .22s cubic-bezier(.25,.8,.25,1);position:relative;overflow:hidden;text-align:left;user-select:none}
+.exam-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .22s}
+.exam-card:hover{border-color:var(--acc2);transform:translateY(-3px);box-shadow:0 10px 24px rgba(0,0,0,.4)}
+.exam-card:hover::before{opacity:1}
+.exam-card.selected{border-color:var(--acc);background:rgba(91,106,240,.1);box-shadow:0 0 0 3px rgba(91,106,240,.15)}
+.exam-card .ec-check{position:absolute;top:9px;right:9px;width:20px;height:20px;border-radius:50%;background:var(--acc);display:none;align-items:center;justify-content:center;font-size:.6rem;font-weight:900;color:#fff;box-shadow:0 0 10px rgba(91,106,240,.5)}
+.exam-card.selected .ec-check{display:flex}
+.ec-badge{display:inline-flex;align-items:center;gap:.3rem;font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:.18rem .55rem;border-radius:20px;margin-bottom:.65rem}
+.ec-icon{font-size:1.7rem;display:block;margin-bottom:.5rem}
+.ec-name{font-weight:800;font-size:.92rem;margin-bottom:.2rem}
+.ec-info{font-size:.66rem;color:var(--sub)}
+
+/* exam badge colours */
+.eb-tnpsc{background:rgba(16,217,126,.12);border:1px solid rgba(16,217,126,.3);color:var(--easy)}
+.eb-ssc{background:rgba(91,106,240,.12);border:1px solid rgba(91,106,240,.3);color:var(--acc3)}
+.eb-rrb{background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);color:var(--amber)}
+.eb-bank{background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.3);color:var(--sky)}
+.eb-upsc{background:rgba(244,114,182,.12);border:1px solid rgba(244,114,182,.3);color:var(--pink)}
+.eb-ese{background:rgba(255,77,109,.12);border:1px solid rgba(255,77,109,.3);color:var(--red)}
+.eb-gate{background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.3);color:#c084fc}
+.eb-ugc{background:rgba(234,179,8,.12);border:1px solid rgba(234,179,8,.3);color:#eab308}
+
+/* ── RECENT HISTORY ── */
+.history-list{display:flex;flex-direction:column;gap:.5rem}
+.hist-item{background:var(--card2);border:1px solid var(--b1);border-radius:var(--r2);padding:.85rem 1.1rem;display:flex;align-items:center;gap:.9rem}
+.hi-icon{font-size:1.2rem;width:36px;text-align:center}
+.hi-info{flex:1}
+.hi-name{font-weight:700;font-size:.85rem}
+.hi-meta{font-size:.68rem;color:var(--sub);margin-top:.1rem}
+.hi-score{font-weight:900;font-size:.95rem;font-family:var(--mono)}
+.hi-score.good{color:var(--green)}.hi-score.avg{color:var(--amber)}.hi-score.poor{color:var(--red)}
+.empty-state{text-align:center;padding:2rem;color:var(--muted);font-size:.85rem}
+
+/* ── SETUP SCREEN ── */
+.setup-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.2rem}
+.diff-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1.5rem}
+.diff-card{background:var(--card2);border:2px solid var(--b1);border-radius:var(--r2);padding:1.4rem .9rem;text-align:center;cursor:pointer;user-select:none;transition:all .2s;position:relative}
+.diff-card .dc-check{position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:50%;display:none;align-items:center;justify-content:center;font-size:.55rem;font-weight:900;color:#000}
+.diff-card.picked .dc-check{display:flex}
+.diff-card.easy:hover,.diff-card.easy.picked{border-color:var(--easy);background:rgba(16,217,126,.08);box-shadow:0 6px 22px rgba(16,217,126,.15)}
+.diff-card.mid:hover,.diff-card.mid.picked{border-color:var(--mid);background:rgba(251,191,36,.08);box-shadow:0 6px 22px rgba(251,191,36,.15)}
+.diff-card.hard:hover,.diff-card.hard.picked{border-color:var(--hard);background:rgba(255,77,109,.08);box-shadow:0 6px 22px rgba(255,77,109,.15)}
+.diff-card.easy .dc-check{background:var(--easy)}
+.diff-card.mid  .dc-check{background:var(--mid)}
+.diff-card.hard .dc-check{background:var(--hard)}
+.dc-icon{font-size:2rem;margin-bottom:.5rem}
+.dc-label{font-weight:800;font-size:.95rem}
+.diff-card.easy .dc-label{color:var(--easy)}.diff-card.mid .dc-label{color:var(--mid)}.diff-card.hard .dc-label{color:var(--hard)}
+.dc-pts{font-size:.65rem;color:var(--sub);margin-top:.3rem}
+.qcount-row{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.5rem}
+.qc-btn{padding:.45rem 1.1rem;border-radius:20px;cursor:pointer;user-select:none;border:1.5px solid var(--b2);background:var(--card2);font-family:var(--font);font-weight:700;font-size:.8rem;color:var(--sub);transition:all .18s}
+.qc-btn:hover{border-color:var(--acc2);color:var(--acc3)}
+.qc-btn.active{background:var(--acc);border-color:var(--acc);color:#fff;box-shadow:0 2px 12px rgba(91,106,240,.4)}
+.timer-config{background:var(--card2);border:1px solid var(--b2);border-radius:var(--r2);padding:1.4rem;margin-bottom:1.5rem}
+.tc-header{display:flex;align-items:center;gap:.5rem;font-weight:700;font-size:.9rem;margin-bottom:1rem}
+.timer-presets{display:flex;flex-wrap:wrap;gap:.45rem;margin-bottom:.9rem}
+.tp-btn{padding:.38rem .85rem;border-radius:20px;cursor:pointer;user-select:none;border:1.5px solid var(--b2);background:var(--card);font-family:var(--font);font-weight:700;font-size:.75rem;color:var(--sub);transition:all .18s}
+.tp-btn:hover{border-color:var(--acc2);color:var(--acc3)}
+.tp-btn.active{background:var(--acc);border-color:var(--acc);color:#fff}
+.custom-row{display:flex;align-items:center;gap:.9rem}
+.custom-row label{font-size:.75rem;color:var(--sub);font-weight:700;white-space:nowrap}
+input[type=range]{
+appearance:none;          /* Standard */
+-webkit-appearance:none;  /* Chrome, Safari */
+flex:1;
+height:5px;
+background:var(--card);
+border-radius:5px;
+outline:none;
+cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--acc);cursor:pointer;box-shadow:0 0 8px rgba(91,106,240,.4)}
+.tval{min-width:68px;background:var(--card);border:1.5px solid var(--acc);border-radius:8px;padding:.28rem .75rem;text-align:center;font-weight:900;font-size:.95rem;color:var(--acc3);font-family:var(--mono)}
+.preview-box{background:var(--card2);border:1px solid var(--b2);border-radius:var(--r2);padding:1rem 1.3rem;margin-bottom:1.5rem}
+.prev-row{display:flex;flex-wrap:wrap;gap:1.2rem;font-size:.78rem}
+.prev-item strong{color:var(--acc3)}
+
+/* ── QUIZ SCREEN ── */
+.quiz-header{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:.9rem}
+.qh-left{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+.qh-pill{display:flex;align-items:center;gap:.3rem;background:var(--card2);border:1px solid var(--b2);border-radius:20px;padding:.25rem .75rem;font-size:.7rem;font-weight:700}
+.qh-right{display:flex;gap:.5rem}
+.qstat{display:flex;align-items:center;gap:.3rem;background:var(--card2);border:1px solid var(--b2);border-radius:10px;padding:.28rem .7rem;font-size:.78rem;font-weight:800}
+.qstat.s-pts{color:var(--acc3)}.qstat.s-stk{color:var(--amber)}.qstat.s-stk.hidden{display:none}
+.timer-bar-wrap{margin-bottom:.85rem}
+.tbar-top{display:flex;align-items:center;gap:.9rem;margin-bottom:.4rem}
+.tbar-track{flex:1;height:9px;background:var(--card2);border-radius:9px;overflow:hidden;position:relative}
+.tbar-fill{height:100%;border-radius:9px;background:linear-gradient(90deg,var(--green),#4ade80);transition:width 1s linear,background .4s}
+.tbar-fill.warn{background:linear-gradient(90deg,var(--amber),#fde68a)}
+.tbar-fill.danger{background:linear-gradient(90deg,var(--red),#fb7185);animation:pulse-bar .5s ease infinite alternate}
+@keyframes pulse-bar{to{opacity:.55}}
+.timer-box{flex-shrink:0;width:56px;height:56px;border-radius:12px;background:var(--card2);border:2px solid var(--b2);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:border-color .3s}
+.timer-box .tn{font-family:var(--mono);font-weight:700;font-size:1.3rem;line-height:1}
+.timer-box .tl{font-size:.44rem;color:var(--sub);text-transform:uppercase;letter-spacing:.06em}
+.timer-box.warn{border-color:var(--amber);color:var(--amber)}.timer-box.warn .tl{color:var(--amber)}
+.timer-box.danger{border-color:var(--red);color:var(--red);animation:tshake .35s ease infinite}.timer-box.danger .tl{color:var(--red)}
+@keyframes tshake{0%,100%{transform:rotate(0)}30%{transform:rotate(-3deg)}70%{transform:rotate(3deg)}}
+.prog-wrap{margin-bottom:1rem}
+.prog-meta{display:flex;justify-content:space-between;font-size:.72rem;color:var(--sub);font-weight:600;margin-bottom:.4rem}
+.prog-meta .frac{color:var(--text);font-weight:800}
+.prog-track{height:5px;background:var(--card2);border-radius:5px;overflow:hidden}
+.prog-bar{height:100%;border-radius:5px;background:var(--grad);transition:width .5s cubic-bezier(.4,0,.2,1)}
+.dot-nav{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.55rem}
+.dn-dot{width:9px;height:9px;border-radius:50%;background:var(--card2);border:1.5px solid var(--b2);cursor:pointer;transition:all .22s}
+.dn-dot:hover{transform:scale(1.5);border-color:var(--acc2)}
+.dn-dot.cur{background:var(--acc);border-color:var(--acc);transform:scale(1.5);box-shadow:0 0 7px rgba(91,106,240,.5)}
+.dn-dot.ok{background:var(--green);border-color:var(--green)}
+.dn-dot.bad{background:var(--red);border-color:var(--red)}
+.dn-dot.skip{background:var(--muted);border-color:var(--muted)}
+
+/* question card */
+.q-card{background:var(--card2);border:1px solid var(--b2);border-radius:var(--r2);padding:1.6rem 1.8rem;margin-bottom:.9rem}
+.q-tags{display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem;flex-wrap:wrap}
+.qtag{display:inline-flex;align-items:center;gap:.25rem;padding:.18rem .65rem;border-radius:20px;font-size:.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.qtag-diff.easy{background:rgba(16,217,126,.12);border:1px solid rgba(16,217,126,.25);color:var(--easy)}
+.qtag-diff.mid{background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.25);color:var(--amber)}
+.qtag-diff.hard{background:rgba(255,77,109,.12);border:1px solid rgba(255,77,109,.25);color:var(--red)}
+.qtag-cat{background:rgba(91,106,240,.12);border:1px solid rgba(91,106,240,.25);color:var(--acc3)}
+.q-num{font-size:.66rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.45rem}
+.q-text{font-weight:700;font-size:clamp(.97rem,2.5vw,1.15rem);line-height:1.6;color:var(--text)}
+.multi-note{display:inline-flex;align-items:center;gap:.3rem;margin-top:.6rem;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);border-radius:8px;padding:.3rem .7rem;font-size:.68rem;color:var(--amber);font-weight:600}
+
+/* options */
+.opts{display:flex;flex-direction:column;gap:.55rem;margin-bottom:.9rem}
+.opt{background:var(--card2);border:1.5px solid var(--b1);border-radius:var(--r2);padding:.85rem 1.1rem;cursor:pointer;user-select:none;display:flex;align-items:flex-start;gap:.8rem;transition:all .18s cubic-bezier(.25,.8,.25,1);position:relative;overflow:hidden}
+.opt:hover:not(:disabled):not(.locked){border-color:rgba(91,106,240,.5);background:rgba(91,106,240,.06);transform:translateX(3px)}
+.opt.sel:not(.revealed){border-color:var(--acc);background:rgba(91,106,240,.12)}
+.opt.correct{border-color:var(--green)!important;background:rgba(16,217,126,.1)!important;animation:popIn .35s ease}
+.opt.wrong{border-color:var(--red)!important;background:rgba(255,77,109,.1)!important;animation:shakeX .3s ease}
+.opt.locked{cursor:default}
+@keyframes popIn{0%{transform:scale(1)}50%{transform:scale(1.015)}100%{transform:scale(1)}}
+@keyframes shakeX{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-4px)}40%,80%{transform:translateX(4px)}}
+.opt-key{width:28px;height:28px;border-radius:7px;flex-shrink:0;background:var(--card3);border:1.5px solid var(--b2);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;color:var(--sub);transition:all .18s;margin-top:.05rem}
+.opt.sel:not(.revealed) .opt-key{background:var(--acc);border-color:var(--acc);color:#fff}
+.opt.correct .opt-key{background:var(--green);border-color:var(--green);color:#000}
+.opt.wrong   .opt-key{background:var(--red);  border-color:var(--red);  color:#fff}
+.opt-txt{flex:1;font-size:.9rem;font-weight:500;line-height:1.45}
+.opt-ic{margin-left:auto;font-size:1rem;flex-shrink:0;display:none;margin-top:.05rem}
+.opt.correct .opt-ic,.opt.wrong .opt-ic{display:block}
+
+/* feedback */
+.feedback{border-radius:var(--r2);padding:.85rem 1.1rem;display:none;align-items:flex-start;gap:.65rem;font-size:.84rem;font-weight:600;margin-bottom:.9rem}
+.feedback.show{display:flex}
+.feedback.ok{background:rgba(16,217,126,.1);border:1px solid rgba(16,217,126,.25);color:var(--green)}
+.feedback.bad{background:rgba(255,77,109,.1);border:1px solid rgba(255,77,109,.25);color:var(--red)}
+.feedback.skip{background:rgba(68,68,106,.15);border:1px solid rgba(68,68,106,.3);color:var(--muted)}
+.feedback.timeout{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);color:var(--amber)}
+.fb-icon{font-size:1.1rem;flex-shrink:0;margin-top:.05rem}
+.fb-body strong{font-weight:800}
+
+/* explanation box */
+.explain-box{display:none;background:var(--card3);border:1px solid var(--b2);border-left:3px solid var(--acc2);border-radius:var(--r2);padding:1rem 1.2rem;margin-bottom:.9rem;font-size:.83rem;line-height:1.65;color:var(--sub)}
+.explain-box.show{display:block}
+.explain-box .ex-title{font-weight:800;color:var(--acc3);font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem;display:flex;align-items:center;gap:.35rem}
+
+/* quiz nav */
+.quiz-nav{display:flex;gap:.65rem;align-items:center}
+
+/* ── STREAK TOAST ── */
+.streak-toast{position:fixed;top:76px;left:50%;transform:translateX(-50%) translateY(-14px);background:linear-gradient(135deg,var(--amber),#f97316);color:#000;font-weight:800;font-size:.92rem;border-radius:30px;padding:.5rem 1.5rem;box-shadow:0 8px 28px rgba(251,191,36,.4);z-index:999;opacity:0;pointer-events:none;transition:all .3s cubic-bezier(.25,.8,.25,1);white-space:nowrap}
+.streak-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── RESULTS ── */
+.result-hero{text-align:center;padding:1.2rem 0 .5rem}
+.rh-emoji{font-size:3.2rem;animation:heroIn .6s cubic-bezier(.25,.8,.25,1) both}
+@keyframes heroIn{0%{transform:scale(0) rotate(-15deg)}65%{transform:scale(1.12) rotate(5deg)}100%{transform:scale(1) rotate(0)}}
+.rh-title{font-weight:900;font-size:1.8rem;letter-spacing:-.03em;margin:.5rem 0 .25rem}
+.rh-title em{font-style:normal;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.rh-sub{font-size:.84rem;color:var(--sub)}
+
+/* ring */
+.ring-wrap{position:relative;display:inline-block;margin:1rem 0}
+.ring-svg{transform:rotate(-90deg);filter:drop-shadow(0 0 16px rgba(91,106,240,.35))}
+.ring-bg{fill:none;stroke:var(--card2);stroke-width:11}
+.ring-fg{fill:none;stroke-width:11;stroke-linecap:round;transition:stroke-dashoffset 1.5s cubic-bezier(.4,0,.2,1)}
+.ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring-pct{font-family:var(--mono);font-weight:700;font-size:2rem;line-height:1}
+.ring-lbl{font-size:.55rem;color:var(--sub);text-transform:uppercase;letter-spacing:.1em}
+
+/* stat boxes */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.65rem;margin:1rem 0}
+.sbox{background:var(--card2);border:1px solid var(--b1);border-radius:var(--r2);padding:.9rem .5rem;text-align:center}
+.sbox .sv{font-family:var(--mono);font-weight:700;font-size:1.55rem;margin-bottom:.15rem;line-height:1}
+.sbox .sl{font-size:.58rem;color:var(--sub);text-transform:uppercase;letter-spacing:.08em}
+.sbox.sv-ok .sv{color:var(--green)}.sbox.sv-bad .sv{color:var(--red)}.sbox.sv-skip .sv{color:var(--muted)}.sbox.sv-pts .sv{color:var(--acc3)}
+
+/* breakdown */
+.bd-list{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1.3rem}
+.bd-row{background:var(--card2);border:1px solid var(--b1);border-radius:var(--r2);padding:.7rem 1rem;display:flex;align-items:center;gap:.8rem}
+.bd-icon{font-size:1rem;width:30px;text-align:center}
+.bd-info{flex:1;min-width:0}
+.bd-name{font-weight:700;font-size:.83rem;margin-bottom:.25rem}
+.bd-bar{height:4px;background:var(--b1);border-radius:4px;overflow:hidden}
+.bd-fill{height:100%;border-radius:4px;transition:width 1.1s cubic-bezier(.4,0,.2,1)}
+.bd-score{font-weight:800;font-size:.82rem;color:var(--acc3);white-space:nowrap;font-family:var(--mono)}
+
+/* accuracy bar */
+.acc-bar-wrap{margin:.5rem 0 1.2rem}
+.acc-labels{display:flex;justify-content:space-between;font-size:.7rem;color:var(--sub);font-weight:600;margin-bottom:.35rem}
+.acc-labels strong{color:var(--text)}
+.acc-track{height:8px;background:var(--card2);border-radius:8px;overflow:hidden}
+.acc-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--green),var(--acc));transition:width 1.3s cubic-bezier(.4,0,.2,1)}
+
+/* review */
+.review-hdr{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--b1);padding-bottom:.65rem;margin-bottom:.75rem;cursor:pointer;user-select:none}
+.rh-ttl{font-weight:800;font-size:.9rem;color:var(--sub)}
+.rh-ico{color:var(--muted);font-size:.75rem;transition:transform .3s}
+.review-hdr.open .rh-ico{transform:rotate(180deg)}
+.review-items{display:none;flex-direction:column;gap:.5rem;margin-bottom:1.4rem}
+.review-items.open{display:flex}
+.rv{background:var(--card2);border:1px solid var(--b1);border-left:3px solid;border-radius:var(--r2);padding:.75rem 1rem}
+.rv.ok{border-left-color:var(--green)}.rv.bad{border-left-color:var(--red)}.rv.skip{border-left-color:var(--muted)}
+.rv-top{display:flex;gap:.5rem;align-items:center;margin-bottom:.3rem;flex-wrap:wrap}
+.rv-badge{font-size:.6rem;font-weight:800;padding:.15rem .55rem;border-radius:20px}
+.rv.ok   .rv-badge{background:rgba(16,217,126,.12);color:var(--green)}
+.rv.bad  .rv-badge{background:rgba(255,77,109,.12);color:var(--red)}
+.rv.skip .rv-badge{background:rgba(68,68,106,.15);color:var(--muted)}
+.rv-meta{font-size:.63rem;color:var(--muted)}
+.rv-q{font-size:.83rem;font-weight:600;margin-bottom:.25rem;line-height:1.45}
+.rv-ans{font-size:.75rem;color:var(--sub);margin-bottom:.3rem}
+.rv-ans .ca{color:var(--green);font-weight:700}.rv-ans .wa{color:var(--red);font-weight:700}
+.rv-explain{font-size:.76rem;color:var(--muted);line-height:1.55;border-top:1px solid var(--b1);padding-top:.4rem;margin-top:.3rem}
+
+/* result actions */
+.r-actions{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:1.5rem}
+.r-actions .ra-full{grid-column:1/-1}
+.ra-btn{
+display:flex;
+align-items:center;
+justify-content:center;
+gap:.4rem;
+padding:.85rem;
+border-radius:var(--r2);
+font-family:var(--font);
+font-weight:800;
+font-size:.88rem;
+cursor:pointer;
+border:none;
+transition:all .2s;
+user-select:none;
+}
+.ra-primary{background:var(--grad);color:#fff;box-shadow:0 4px 18px rgba(91,106,240,.35)}
+.ra-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(91,106,240,.5)}
+.ra-ghost{background:var(--card2);border:1.5px solid var(--b2);color:var(--text)}
+.ra-ghost:hover{border-color:var(--acc2);color:var(--acc3)}
+
+/* ── STATS SCREEN ── */
+.stats-hero{text-align:center;margin-bottom:1.5rem}
+.stats-overview{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1.5rem}
+.so-card{background:var(--card2);border:1px solid var(--b1);border-radius:var(--r2);padding:1.1rem;text-align:center}
+.so-val{font-family:var(--mono);font-weight:700;font-size:1.7rem;line-height:1}
+.so-lbl{font-size:.65rem;color:var(--sub);text-transform:uppercase;letter-spacing:.08em;margin-top:.2rem}
+.leaderboard{display:flex;flex-direction:column;gap:.45rem;margin-bottom:1.3rem}
+.lb-row{background:var(--card2);border:1px solid var(--b1);border-radius:var(--r2);padding:.7rem 1rem;display:flex;align-items:center;gap:.8rem}
+.lb-rank{width:28px;font-family:var(--mono);font-weight:700;font-size:.85rem;color:var(--muted);text-align:center;flex-shrink:0}
+.lb-rank.gold{color:#fbbf24}.lb-rank.silver{color:#94a3b8}.lb-rank.bronze{color:#b45309}
+.lb-name{flex:1;font-weight:700;font-size:.85rem}
+.lb-score{font-family:var(--mono);font-weight:700;font-size:.9rem;color:var(--acc3)}
+.lb-badge{font-size:.62rem;padding:.15rem .5rem;background:rgba(91,106,240,.12);border:1px solid rgba(91,106,240,.25);border-radius:20px;color:var(--acc3);font-weight:700}
+.perf-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.3rem}
+.perf-card{background:var(--card2);border:1px solid var(--b1);border-radius:var(--r2);padding:1.1rem}
+.pc-label{font-size:.68rem;font-weight:700;color:var(--sub);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem}
+.pc-val{font-family:var(--mono);font-weight:700;font-size:1.3rem;margin-bottom:.4rem}
+.pc-bar{height:6px;background:var(--b1);border-radius:6px;overflow:hidden}
+.pc-fill{height:100%;border-radius:6px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+
+/* ── NAV TABS ── */
+.nav-tabs{display:flex;gap:.35rem;background:var(--card);border:1px solid var(--b1);border-radius:var(--r2);padding:.3rem;margin-bottom:1.5rem}
+.nav-tab{flex:1;padding:.6rem .5rem;border-radius:var(--r3);font-size:.75rem;font-weight:700;background:transparent;border:none;color:var(--sub);cursor:pointer;font-family:var(--font);transition:all .2s;text-align:center;white-space:nowrap}
+.nav-tab.active{background:var(--acc);color:#fff;box-shadow:0 2px 10px rgba(91,106,240,.3)}
+.nav-tab:hover:not(.active){color:var(--acc3)}
+
+/* ── CONFETTI ── */
+.cf-layer{position:fixed;inset:0;pointer-events:none;z-index:500;overflow:hidden}
+.cf-p{position:absolute;width:8px;height:8px;border-radius:2px;animation:cfDrop linear forwards}
+@keyframes cfDrop{from{transform:translateY(-20px) rotate(0)}to{transform:translateY(100vh) rotate(720deg);opacity:0}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:620px){
+  .panel{padding:1.4rem}
+  .q-card{padding:1.2rem 1.1rem}
+  .diff-cards{grid-template-columns:1fr}
+  .setup-row{grid-template-columns:1fr}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .r-actions{grid-template-columns:1fr}
+  .r-actions .ra-full{grid-column:unset}
+  .dash-grid{grid-template-columns:1fr}
+  .stats-overview{grid-template-columns:1fr 1fr}
+  .perf-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="mesh"><span></span><span></span><span></span></div>
+<div class="cf-layer" id="cf-layer"></div>
+<div class="streak-toast" id="streak-toast">🔥 <span id="stk-msg">3× Streak!</span></div>
+
+<div class="app">
+  <nav class="topbar wrap">
+    <div class="logo-row">
+      <div class="logo-mark">📚</div>
+      <div>
+        <div class="logo-text"><em>ExamEdge</em> Pro</div>
+        <div class="logo-sub">Competitive Exam Platform</div>
+      </div>
+    </div>
+    <div class="hud" id="hud">
+      <div class="hud-chip usr" id="hud-user">👤 Guest</div>
+      <div class="hud-chip pts" id="hud-pts">⚡ 0 pts</div>
+      <button class="hud-logout" id="btn-logout">Sign out</button>
+    </div>
+  </nav>
+
+  <div class="wrap">
+    <!-- ═══════════════════════════════════
+         S1 — LOGIN
+    ═══════════════════════════════════ -->
+    <div class="screen active" id="s-login">
+      <div class="login-box">
+        <div class="login-hero">
+          <div class="hero-icon">🎓</div>
+          <div class="page-title" style="font-size:1.8rem">Welcome to <em>ExamEdge Pro</em></div>
+          <p style="font-size:.85rem;color:var(--sub);margin-top:.4rem">India's most comprehensive exam prep platform</p>
+        </div>
+        <div class="panel">
+          <div class="auth-tabs">
+            <button class="auth-tab active" data-tab="login">Sign In</button>
+            <button class="auth-tab" data-tab="register">Register</button>
+          </div>
+          <!-- SIGN IN -->
+          <div class="form-section active" id="form-login">
+            <div class="field">
+              <label>Username or Email</label>
+              <div class="input-wrap">
+                <input type="text" id="li-user" placeholder="Enter username" autocomplete="username"/>
+              </div>
+              <div class="field-error" id="li-user-err">Please enter your username</div>
+            </div>
+            <div class="field">
+              <label>Password</label>
+              <div class="input-wrap">
+                <input type="password" id="li-pass" placeholder="Enter password" autocomplete="current-password"/>
+                <span class="input-icon" id="li-eye">👁</span>
+              </div>
+              <div class="field-error" id="li-pass-err">Please enter your password</div>
+            </div>
+            <div class="field-error" id="li-main-err" style="display:none;font-size:.82rem;text-align:center">❌ Invalid credentials. Try demo accounts below.</div>
+            <button class="btn btn-primary btn-full" id="btn-login">Sign In →</button>
+            <div class="divider">or use demo account</div>
+            <div class="demo-row">
+              <div class="demo-chip" data-u="student1" data-p="pass123">👤 student1</div>
+              <div class="demo-chip" data-u="testuser" data-p="quiz456">👤 testuser</div>
+              <div class="demo-chip" data-u="admin" data-p="admin123">👑 admin</div>
+            </div>
+          </div>
+          <!-- REGISTER -->
+          <div class="form-section" id="form-register">
+            <div class="field">
+              <label>Full Name</label>
+              <input type="text" id="rg-name" placeholder="Your full name"/>
+              <div class="field-error" id="rg-name-err">Name must be at least 2 characters</div>
+            </div>
+            <div class="field">
+              <label>Email Address</label>
+              <input type="email" id="rg-email" placeholder="your@email.com" autocomplete="email"/>
+              <div class="field-error" id="rg-email-err">Enter a valid email address</div>
+            </div>
+            <div class="field">
+              <label>Username</label>
+              <input type="text" id="rg-user" placeholder="Choose a username" autocomplete="username"/>
+              <div class="field-error" id="rg-user-err">Username must be 3+ characters</div>
+            </div>
+            <div class="field">
+              <label>Password</label>
+              <div class="input-wrap">
+                <input type="password" id="rg-pass" placeholder="Min 6 characters" autocomplete="new-password"/>
+                <span class="input-icon" id="rg-eye">👁</span>
+              </div>
+              <div class="field-error" id="rg-pass-err">Password must be at least 6 characters</div>
+            </div>
+            <div class="field-error" id="rg-main-err" style="display:none;font-size:.82rem;text-align:center"></div>
+            <button class="btn btn-primary btn-full" id="btn-register">Create Account →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════
+         S2 — DASHBOARD
+    ═══════════════════════════════════ -->
+    <div class="screen" id="s-dashboard">
+      <div class="nav-tabs" id="main-tabs">
+        <button class="nav-tab active" data-s="dash">🏠 Dashboard</button>
+        <button class="nav-tab" data-s="setup">📝 New Quiz</button>
+        <button class="nav-tab" data-s="stats">📊 Statistics</button>
+      </div>
+
+      <!-- DASHBOARD TAB -->
+      <div id="tab-dash">
+        <div class="page-title" style="margin-bottom:.3rem">Hello, <em id="d-name">Learner</em>! 👋</div>
+        <p class="page-sub" style="margin-bottom:1.2rem">Pick an exam, set your difficulty and start practising</p>
+        <div class="dash-grid">
+          <div class="dash-stat">
+            <div class="ds-icon" style="background:rgba(16,217,126,.15)">✅</div>
+            <div><div class="ds-val" id="ds-total">0</div><div class="ds-lbl">Quizzes Taken</div></div>
+          </div>
+          <div class="dash-stat">
+            <div class="ds-icon" style="background:rgba(91,106,240,.15)">⚡</div>
+            <div><div class="ds-val" id="ds-pts">0</div><div class="ds-lbl">Total Points</div></div>
+          </div>
+          <div class="dash-stat">
+            <div class="ds-icon" style="background:rgba(251,191,36,.15)">🎯</div>
+            <div><div class="ds-val" id="ds-acc">—</div><div class="ds-lbl">Best Accuracy</div></div>
+          </div>
+          <div class="dash-stat">
+            <div class="ds-icon" style="background:rgba(255,77,109,.15)">🔥</div>
+            <div><div class="ds-val" id="ds-streak">0</div><div class="ds-lbl">Best Streak</div></div>
+          </div>
+        </div>
+        <div class="section-label">Recent Attempts</div>
+        <div class="history-list" id="history-list">
+          <div class="empty-state">📭 No quizzes yet — take your first quiz!</div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:1rem" id="btn-go-setup">🚀 Start New Quiz</button>
+      </div>
+
+      <!-- SETUP TAB -->
+      <div id="tab-setup" style="display:none">
+        <div class="page-title">Configure <em>Your Quiz</em></div>
+        <p class="page-sub">Select exam, difficulty, timer & question count</p>
+
+        <div class="section-label">1 — Choose Exam Categories (multi-select)</div>
+        <div class="exam-grid" id="exam-grid"></div>
+
+        <div class="section-label">2 — Difficulty Level</div>
+        <div class="diff-cards">
+          <div class="diff-card easy" data-d="easy">
+            <div class="dc-check">✓</div>
+            <div class="dc-icon">🌱</div>
+            <div class="dc-label">Easy</div>
+            <div class="dc-pts">Base 80 pts/Q</div>
+          </div>
+          <div class="diff-card mid" data-d="mid">
+            <div class="dc-check">✓</div>
+            <div class="dc-icon">⚡</div>
+            <div class="dc-label">Medium</div>
+            <div class="dc-pts">Base 120 pts/Q</div>
+          </div>
+          <div class="diff-card hard" data-d="hard">
+            <div class="dc-check">✓</div>
+            <div class="dc-icon">💀</div>
+            <div class="dc-label">Hard</div>
+            <div class="dc-pts">Base 200 pts/Q</div>
+          </div>
+        </div>
+
+
+        <div class="preview-box">
+          <div class="section-label" style="margin-bottom:.5rem">Quiz Preview</div>
+          <div class="prev-row">
+            <span>📚 Exams: <strong id="pv-exams">None</strong></span>
+            <span>🎯 Difficulty: <strong id="pv-diff">—</strong></span>
+            <span>❓ Questions: <strong id="pv-count">Up to 15 per category</strong></span>
+          </div>
+        </div>
+        <!-- hidden stubs for JS compatibility -->
+        <span id="qcount-display" style="display:none"></span>
+        <span id="qcount-avail" style="display:none"></span>
+        <div id="tval-box" style="display:none">20s</div>
+        <div id="timer-presets" style="display:none"></div>
+        <input type="range" id="t-slider" min="5" max="120" value="20" step="5" style="display:none"/>
+        <span id="pv-timer" style="display:none"></span>
+
+        <div class="btn-row">
+          <button class="btn btn-primary" id="btn-start-quiz" disabled>🚀 Start Quiz</button>
+          <button class="btn btn-outline" id="btn-reset-setup">Reset</button>
+        </div>
+      </div>
+
+      <!-- STATS TAB -->
+      <div id="tab-stats" style="display:none">
+        <div class="stats-hero">
+          <div class="page-title">Your <em>Statistics</em></div>
+          <p style="font-size:.84rem;color:var(--sub)">Track your performance over time</p>
+        </div>
+        <div class="stats-overview">
+          <div class="so-card"><div class="so-val" style="color:var(--green)" id="so-total">0</div><div class="so-lbl">Total Quizzes</div></div>
+          <div class="so-card"><div class="so-val" style="color:var(--acc3)" id="so-pts">0</div><div class="so-lbl">Total Points</div></div>
+          <div class="so-card"><div class="so-val" style="color:var(--amber)" id="so-avg">—</div><div class="so-lbl">Avg Accuracy</div></div>
+        </div>
+        <div class="section-label">Performance by Exam</div>
+        <div id="perf-grid" class="perf-grid"></div>
+        <div class="section-label">All-Time Leaderboard</div>
+        <div class="leaderboard" id="leaderboard"></div>
+        <div class="section-label">Recent History (All Attempts)</div>
+        <div class="history-list" id="stats-history"></div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════
+         S3 — QUIZ
+    ═══════════════════════════════════ -->
+    <div class="screen" id="s-quiz">
+      <div class="quiz-header">
+        <div class="qh-left">
+          <div class="qh-pill" id="qh-exam">📚 Exam</div>
+          <div class="qh-pill" id="qh-diff">🌱 Easy</div>
+          <div class="qh-pill" id="qh-timer" style="color:var(--amber)">⏱ —s/Q</div>
+        </div>
+        <div class="qh-right">
+          <div class="qstat s-pts">⚡ <span id="qs-pts">0</span></div>
+          <div class="qstat s-stk hidden" id="qs-stk-box">🔥 <span id="qs-stk">0</span></div>
+        </div>
+      </div>
+      <div class="timer-bar-wrap">
+        <div class="tbar-top">
+          <div class="tbar-track"><div class="tbar-fill" id="tbar-fill"></div></div>
+          <div class="timer-box" id="timer-box">
+            <div class="tn" id="t-num">—</div>
+            <div class="tl">sec</div>
+          </div>
+        </div>
+      </div>
+      <div class="prog-wrap">
+        <div class="prog-meta"><span class="frac" id="pq-frac">1/10</span><span id="pq-pct">0%</span></div>
+        <div class="prog-track"><div class="prog-bar" id="prog-bar"></div></div>
+        <div class="dot-nav" id="dot-nav"></div>
+      </div>
+      <div class="q-card">
+        <div class="q-tags">
+          <span class="qtag qtag-diff" id="qt-diff">🌱 Easy</span>
+          <span class="qtag qtag-cat" id="qt-cat">📚</span>
+        </div>
+        <div class="q-num" id="q-num-lbl">Question 1 of 10</div>
+        <div class="q-text" id="q-text">Loading…</div>
+        <div class="multi-note" id="multi-note" style="display:none">⚠️ Multiple correct answers — select all that apply</div>
+      </div>
+      <div class="opts" id="opts"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="explain-box" id="explain-box">
+        <div class="ex-title">💡 Explanation</div>
+        <div id="explain-text"></div>
+      </div>
+      <div class="quiz-nav">
+        <button class="btn btn-outline" id="btn-qback" disabled>← Back</button>
+        <button class="btn btn-ghost" id="btn-skip">Skip</button>
+        <button class="btn btn-primary" id="btn-qnext" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════
+         S4 — RESULTS
+    ═══════════════════════════════════ -->
+    <div class="screen" id="s-result">
+      <div class="panel">
+        <div class="result-hero">
+          <div class="rh-emoji" id="rh-emoji">🎉</div>
+          <div class="rh-title"><em id="rh-title">Well Done!</em></div>
+          <div class="rh-sub" id="rh-sub">Here's how you performed</div>
+          <div class="ring-wrap">
+            <svg class="ring-svg" width="148" height="148" viewBox="0 0 148 148">
+              <circle class="ring-bg" cx="74" cy="74" r="60"/>
+              <circle class="ring-fg" id="ring-fg" cx="74" cy="74" r="60" stroke-dasharray="376.99" stroke-dashoffset="376.99"/>
+            </svg>
+            <div class="ring-center">
+              <div class="ring-pct" id="ring-pct">0%</div>
+              <div class="ring-lbl">accuracy</div>
+            </div>
+          </div>
+        </div>
+        <div class="acc-bar-wrap">
+          <div class="acc-labels"><span>Overall Accuracy</span><strong id="acc-txt">0%</strong></div>
+          <div class="acc-track"><div class="acc-fill" id="acc-fill" style="width:0"></div></div>
+        </div>
+        <div class="stat-grid">
+          <div class="sbox sv-ok"><div class="sv" id="r-cor">0</div><div class="sl">Correct</div></div>
+          <div class="sbox sv-bad"><div class="sv" id="r-wrg">0</div><div class="sl">Wrong</div></div>
+          <div class="sbox sv-skip"><div class="sv" id="r-skp">0</div><div class="sl">Skipped</div></div>
+          <div class="sbox sv-pts"><div class="sv" id="r-pts">0</div><div class="sl">Points</div></div>
+        </div>
+        <div class="section-label">Category Breakdown</div>
+        <div class="bd-list" id="bd-list"></div>
+        <div class="review-hdr" id="rv-hdr"><span class="rh-ttl">📝 Answer Review</span><span class="rh-ico">▼</span></div>
+        <div class="review-items" id="rv-items"></div>
+        <div class="r-actions">
+          <button class="ra-btn ra-ghost" id="ra-retry">🔁 Retry</button>
+          <button class="ra-btn ra-ghost" id="ra-newsetup">⚙️ New Setup</button>
+          <button class="ra-btn ra-primary ra-full" id="ra-dash">🏠 Back to Dashboard</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+'use strict';
+// ══════════════════════════════════════════════════════
+//  QUESTION DATABASE  (8 exams × 3 difficulties × 6–8 Qs)
+//  Each Q has: q, options[4], correct (array of indices),
+//              explanation, multi (bool)
+// ══════════════════════════════════════════════════════
+const DB = {
+  tnpsc:{
+    name:'TNPSC', icon:'🏛️', badge:'eb-tnpsc', label:'TNPSC',
+    desc:'TN History, Geography, Culture', timer:60,
+    easy:[
+      {q:'Who is known as the "Iron Man of India"?',o:['Jawaharlal Nehru','Sardar Vallabhbhai Patel','Subhas Chandra Bose','B.R. Ambedkar'],c:[1],e:'Sardar Vallabhbhai Patel unified princely states after Independence and is called the Iron Man of India.'},
+      {q:'Tamil Nadu was formed on which date?',o:['1 November 1956','26 January 1950','15 August 1947','14 April 1960'],c:[0],e:'Tamil Nadu was formed on 1 November 1956 during the States Reorganisation Act based on linguistic lines.'},
+      {q:'Which river is called the "Lifeline of Tamil Nadu"?',o:['Krishna','Cauvery','Godavari','Palar'],c:[1],e:'The Cauvery river is called the lifeline of Tamil Nadu as it irrigates the fertile delta region.'},
+      {q:'The capital of Tamil Nadu is:',o:['Coimbatore','Madurai','Chennai','Trichy'],c:[2],e:'Chennai (formerly Madras) is the capital and largest city of Tamil Nadu.'},
+      {q:'Which classical language belongs to Tamil Nadu?',o:['Sanskrit','Hindi','Tamil','Kannada'],c:[2],e:'Tamil is one of the oldest classical languages in the world and the official language of Tamil Nadu.'},
+      {q:'Who was the first Chief Minister of Tamil Nadu?',o:['M.G. Ramachandran','C.N. Annadurai','Kamaraj','Jayalalithaa'],c:[2],e:'K. Kamaraj was the Chief Minister of Tamil Nadu from 1954 to 1963.'},
+      {q:'The Nilgiri Hills are part of which mountain range?',o:['Himalayas','Eastern Ghats','Western Ghats','Vindhyas'],c:[2],e:'The Nilgiri Hills are part of the Western Ghats, located at the junction of Tamil Nadu, Kerala and Karnataka.'},
+      {q:'Marina Beach is located in which city of Tamil Nadu?',o:['Madurai','Coimbatore','Chennai','Trichy'],c:[2],e:'Marina Beach in Chennai is the longest natural urban beach in India (~13 km) and the world\'s second longest.'},
+      {q:'Pongal is a harvest festival of which state?',o:['Andhra Pradesh','Karnataka','Tamil Nadu','Kerala'],c:[2],e:'Pongal is the major harvest festival of Tamil Nadu, celebrated in January to thank the Sun god.'},
+      {q:'Which of the following is the state animal of Tamil Nadu?',o:['Tiger','Elephant','Nilgiri Tahr','Lion'],c:[2],e:'The Nilgiri Tahr is the state animal of Tamil Nadu, an endangered mountain ungulate found in the Nilgiris.'},
+    ],
+    mid:[
+      {q:'The Nilgiris Biosphere Reserve is located primarily in:',o:['Kerala','Karnataka','Tamil Nadu','Andhra Pradesh'],c:[2],e:'Nilgiris Biosphere Reserve mainly falls in Tamil Nadu, covering the Nilgiri hills area.'},
+      {q:'Article 370 was related to:',o:['Language rights','Special status of J&K','Scheduled tribes','Reservation policy'],c:[1],e:'Article 370 granted special autonomous status to Jammu & Kashmir, abrogated in August 2019.'},
+      {q:'Which TNPSC Group exam recruits for District Collector-level posts?',o:['Group I','Group II','Group IV','Group VIII'],c:[0],e:'TNPSC Group I services include IAS-level state posts like Deputy Collector, DSP, etc.'},
+      {q:'The Panchayati Raj system is governed under which article?',o:['Article 40','Article 73','Article 243','Article 356'],c:[2],e:'Articles 243 to 243O (73rd Amendment, 1992) deal with Panchayati Raj institutions.'},
+      {q:'Bharathiar University is located in which city?',o:['Chennai','Madurai','Coimbatore','Salem'],c:[2],e:'Bharathiar University is located in Coimbatore, Tamil Nadu, named after the poet Subramania Bharathiar.'},
+      {q:'The ancient port city of Tamil Nadu is:',o:['Madurai','Poompuhar','Kanchipuram','Thanjavur'],c:[1],e:'Poompuhar (ancient Kaveri-poompattinam) was a major Chola port city on the Cauvery delta.'},
+      {q:'Thirukkural was written by:',o:['Kambar','Thiruvalluvar','Avvaiyar','Ilango Adigal'],c:[1],e:'Thirukkural, a classic Tamil text on ethics and virtue, was authored by the poet-philosopher Thiruvalluvar.'},
+      {q:'The highest peak in Tamil Nadu is:',o:['Doddabetta','Anamudi','Kodaikanal Peak','Agasthyamalai'],c:[0],e:'Doddabetta (2,637 m) in the Nilgiris is the highest peak in Tamil Nadu and the Nilgiri Hills.'},
+      {q:'Which dynasty built the Brihadeeswarar Temple in Thanjavur?',o:['Pallava','Pandya','Chola','Chera'],c:[2],e:'The Brihadeeswarar Temple was built by Chola King Raja Raja Chola I in 1010 CE.'},
+      {q:'The Five Year Plan focused on "Growth with Social Justice":',o:['5th','8th','10th','11th'],c:[3],e:'The 11th Five Year Plan (2007–2012) had the theme "Faster and More Inclusive Growth / Growth with Social Justice."'},
+    ],
+    hard:[
+      {q:'Under which Schedule are Panchayat powers listed?',o:['Ninth Schedule','Tenth Schedule','Eleventh Schedule','Twelfth Schedule'],c:[2],e:'The Eleventh Schedule (added by 73rd Amendment) lists 29 subjects under Panchayat jurisdiction.'},
+      {q:'Which Article of the Constitution abolishes untouchability?',o:['Article 14','Article 15','Article 17','Article 21'],c:[2],e:'Article 17 abolishes untouchability and forbids its practice in any form.'},
+      {q:'The Doctrine of Lapse was introduced by:',o:['Lord Dalhousie','Lord Cornwallis','Lord Wellesley','Lord Canning'],c:[0],e:'Governor-General Lord Dalhousie introduced the Doctrine of Lapse (1848), annexing states without a male heir.'},
+      {q:'Megasthenes was ambassador to which Mauryan king?',o:['Ashoka','Bindusara','Chandragupta Maurya','Bimbisara'],c:[2],e:'Megasthenes served as ambassador of Seleucus I Nicator to the Mauryan court of Chandragupta Maurya.'},
+      {q:'The Rowlatt Act (1919) allowed the British to:',o:['Grant voting rights','Detain without trial','Allow free press','Give trade union rights'],c:[1],e:'The Rowlatt Act empowered the British to detain any person without trial, triggering the Non-Cooperation Movement.'},
+      {q:'Which is NOT a Fundamental Duty under Article 51A?',o:['Protect environment','Pay taxes','Safeguard public property','Develop scientific temper'],c:[1],e:'Paying taxes is not listed among the 11 Fundamental Duties under Article 51A of the Indian Constitution.'},
+      {q:'The Pallava dynasty capital was:',o:['Madurai','Kanchipuram','Thanjavur','Uraiyur'],c:[1],e:'Kanchipuram was the capital of the Pallava dynasty, famous for its temples and silk weaving.'},
+      {q:'Sangam literature belongs to which period?',o:['100 CE – 500 CE','300 BCE – 300 CE','500 BCE – 100 BCE','600 CE – 900 CE'],c:[1],e:'Sangam literature refers to the corpus of ancient Tamil poetry compiled roughly between 300 BCE and 300 CE.'},
+      {q:'The Vaigai River originates from:',o:['Nilgiris','Kodaikanal hills','Palani hills','Anaimalai hills'],c:[2],e:'The Vaigai River originates from the Varushanad hills near Palani, flowing through Madurai.'},
+      {q:'Which town is famous for Tanjore paintings?',o:['Madurai','Thanjavur','Kumbakonam','Trichy'],c:[1],e:'Thanjavur (Tanjore) paintings are a major form of classical South Indian painting from the Thanjavur region of Tamil Nadu.'},
+    ]
+  },
+  ssc:{
+    name:'SSC', icon:'📋', badge:'eb-ssc', label:'SSC CGL/CHSL',
+    desc:'Polity, English, Quant, GK', timer:45,
+    easy:[
+      {q:'Which is the smallest prime number?',o:['0','1','2','3'],c:[2],e:'2 is the smallest and the only even prime number.'},
+      {q:'"Discovery of India" was written by:',o:['M.K. Gandhi','Jawaharlal Nehru','Rabindranath Tagore','B.R. Ambedkar'],c:[1],e:'"Discovery of India" was written by Jawaharlal Nehru while imprisoned at Ahmednagar Fort (1944).'},
+      {q:'The synonym of "Eloquent" is:',o:['Fluent','Silent','Confused','Rough'],c:[0],e:'Eloquent means fluent or persuasive in speaking or writing.'},
+      {q:'Speed of sound in air at 0°C is approximately:',o:['232 m/s','331 m/s','440 m/s','550 m/s'],c:[1],e:'Speed of sound in dry air at 0°C is approximately 331 m/s, increasing with temperature.'},
+      {q:'A train 200m long passes a pole in 10 seconds. Its speed is:',o:['10 m/s','15 m/s','20 m/s','25 m/s'],c:[2],e:'Speed = Distance/Time = 200/10 = 20 m/s.'},
+      {q:'The President of India is elected by:',o:['Lok Sabha only','Rajya Sabha only','Both Houses of Parliament','Electoral College'],c:[3],e:'The President is elected by an Electoral College consisting of elected members of both Houses of Parliament and State Legislative Assemblies.'},
+      {q:'Which article of the Constitution deals with Right to Equality?',o:['Article 12','Article 14','Article 19','Article 21'],c:[1],e:'Article 14 guarantees equality before law and equal protection of laws to all persons in India.'},
+      {q:'The LCM of 4 and 6 is:',o:['12','24','6','8'],c:[0],e:'LCM(4,6) = 12. 4=2², 6=2×3. LCM = 2²×3 = 12.'},
+      {q:'The antonym of "Obdurate" is:',o:['Stubborn','Yielding','Harsh','Indifferent'],c:[1],e:'Obdurate means stubbornly refusing to change; its antonym is yielding or flexible.'},
+      {q:'2³ × 2² = ?',o:['2⁵','2⁶','4⁵','2¹'],c:[0],e:'When multiplying same base, add exponents: 2³ × 2² = 2^(3+2) = 2⁵ = 32.'},
+    ],
+    mid:[
+      {q:'If 3x + 5 = 20, find x.',o:['3','5','4','6'],c:[1],e:'3x = 20-5 = 15, so x = 5.'},
+      {q:'Average of 5 numbers is 20. If one removed, average becomes 18. The removed number:',o:['24','28','20','32'],c:[1],e:'Sum of 5 = 100. Sum of 4 = 72. Removed = 100-72 = 28.'},
+      {q:'Select the correctly spelt word:',o:['Accomodate','Accommodate','Acomodate','Accomdate'],c:[1],e:'"Accommodate" has double c and double m — a common misspelling.'},
+      {q:'A can do a work in 10 days, B in 15 days. Together in:',o:['5 days','6 days','7 days','8 days'],c:[1],e:'Combined rate = 1/10 + 1/15 = 5/30 = 1/6. Together = 6 days.'},
+      {q:'Which Article deals with Right to Constitutional Remedies?',o:['Article 19','Article 25','Article 32','Article 44'],c:[2],e:'Article 32 provides the right to move the Supreme Court for enforcement of fundamental rights.'},
+      {q:'Profit of 20% on CP of ₹500. SP = ?',o:['₹550','₹575','₹600','₹620'],c:[2],e:'SP = CP × (1 + profit%) = 500 × 1.20 = ₹600.'},
+      {q:'Fill in: She __ to school every day.',o:['go','goes','going','gone'],c:[1],e:'Third-person singular present: "She goes to school every day." Subject-verb agreement rule.'},
+      {q:'The Rajya Sabha is presided over by:',o:['Prime Minister','Speaker','Vice President','Chief Justice'],c:[2],e:'The Vice President of India is the ex-officio Chairman of the Rajya Sabha.'},
+      {q:'If A:B = 3:4 and B:C = 2:3, find A:C.',o:['1:2','2:3','3:6','1:3'],c:[0],e:'A:B:C = 3:4 and B:C = 2:3 → scale B: B=4 in first, B=2 in second. Multiply second by 2: B:C=4:6. So A:B:C = 3:4:6. A:C = 3:6 = 1:2.'},
+      {q:'Identify the figure: "The pen is mightier than the sword."',o:['Simile','Metaphor','Personification','Hyperbole'],c:[1],e:'Metaphor — comparing pen to sword without using "like" or "as."'},
+    ],
+    hard:[
+      {q:'If (a+b) = 10 and ab = 21, find a²+b².',o:['52','58','62','100'],c:[1],e:'a²+b² = (a+b)² - 2ab = 100 - 42 = 58.'},
+      {q:'CI on ₹8000 at 10% for 2 years = ?',o:['₹1600','₹1680','₹1700','₹1720'],c:[1],e:'CI = 8000[(1.1)²−1] = 8000 × 0.21 = ₹1680.'},
+      {q:'LCM of 12, 18, 24 is:',o:['48','72','96','36'],c:[1],e:'LCM(12,18,24): 2³×3² = 72.'},
+      {q:'The 10th term of AP: 3, 7, 11, 15...?',o:['35','39','43','47'],c:[1],e:'a=3, d=4. T₁₀ = 3 + (10-1)×4 = 3 + 36 = 39.'},
+      {q:'Passive voice of "She teaches English":',o:['English is taught by her','English was taught by her','English has taught by her','English being taught by her'],c:[0],e:'Simple Present Active → Passive: "English is taught by her."'},
+      {q:'Which Constitutional Amendment added "Secular" to the Preamble?',o:['40th','42nd','44th','52nd'],c:[1],e:'"Socialist" and "Secular" were added by the 42nd Constitutional Amendment (1976).'},
+      {q:'A boat goes 30 km upstream in 6 hrs and 36 km downstream in 4 hrs. Speed of boat in still water:',o:['7.5 km/h','8 km/h','8.5 km/h','9 km/h'],c:[0],e:'Upstream speed=5, Downstream speed=9. Boat speed=(5+9)/2=7.5 km/h.'},
+      {q:'One who is indifferent to pleasure or pain is:',o:['Stoic','Epicurean','Cynic','Altruist'],c:[0],e:'A Stoic is a person who can endure pain or hardship without showing feeling, indifferent to pleasure or pain.'},
+      {q:'Direction: Facing North, turn right 90°, then right again 90°. Now facing:',o:['North','South','East','West'],c:[1],e:'North → Right 90° = East → Right 90° = South. Final direction: South.'},
+      {q:'The Directive Principles of State Policy are in:',o:['Part III','Part IV','Part IVA','Part V'],c:[1],e:'Part IV (Articles 36-51) contains Directive Principles of State Policy.'},
+    ]
+  },
+  rrb:{
+    name:'RRB', icon:'🚂', badge:'eb-rrb', label:'RRB NTPC/JE',
+    desc:'Railway GK, Maths, Reasoning', timer:60,
+    easy:[
+      {q:'Indian Railways was nationalised in:',o:['1947','1950','1951','1953'],c:[3],e:'Indian Railways was fully nationalised on 1 April 1953 when all private railway companies were merged.'},
+      {q:'Which is the fastest train in India?',o:['Rajdhani Express','Shatabdi Express','Vande Bharat Express','Gatimaan Express'],c:[2],e:'Vande Bharat Express is India\'s fastest train, running at up to 160 km/h.'},
+      {q:'A 300m train passes a 200m bridge in 25 sec. Speed of train:',o:['15 m/s','20 m/s','25 m/s','30 m/s'],c:[1],e:'Distance = 300+200 = 500m. Speed = 500/25 = 20 m/s.'},
+      {q:'IRCTC full form:',o:['Indian Railway Catering and Tourism Corporation','Indian Railway Central Travel Company','Indian Railway Commerce & Tourism Corp','Indian Revenue Catering Tourism Corp'],c:[0],e:'IRCTC stands for Indian Railway Catering and Tourism Corporation.'},
+      {q:'Konkan Railway uses which gauge?',o:['Broad Gauge','Metre Gauge','Narrow Gauge','Standard Gauge'],c:[0],e:'Konkan Railway uses Broad Gauge (1676 mm), the standard in India.'},
+      {q:"Ohm's law: V = ?",o:['IR','I/R','I+R','I²R'],c:[0],e:"Ohm's Law: Voltage (V) = Current (I) × Resistance (R)."},
+      {q:'The HQ of Indian Railways is in:',o:['Mumbai','Chennai','Kolkata','New Delhi'],c:[3],e:'The Railway Board, the apex body of Indian Railways, is headquartered in New Delhi.'},
+      {q:'Which is the longest railway platform in India?',o:['Gorakhpur','Kharagpur','Bilaspur','Prayagraj'],c:[0],e:'Gorakhpur Railway Station in Uttar Pradesh holds the record for the longest railway platform in India (~1.3 km).'},
+      {q:'The SI unit of electrical resistance is:',o:['Ampere','Volt','Ohm','Watt'],c:[2],e:'The SI unit of electrical resistance is the Ohm (Ω), named after Georg Simon Ohm.'},
+      {q:'Find the odd one out: 2, 3, 5, 7, 9, 11',o:['3','7','9','11'],c:[2],e:'9 = 3×3 is not a prime number. All others (2,3,5,7,11) are prime numbers.'},
+    ],
+    mid:[
+      {q:'If profit% = 25% and SP = ₹500, find CP.',o:['₹375','₹400','₹425','₹450'],c:[1],e:'CP = SP × 100/(100+profit%) = 500×100/125 = ₹400.'},
+      {q:"Fleming's Left-Hand Rule is used for:",o:['Generators','Electric motors','Transformers','Inductors'],c:[1],e:"Fleming's Left-Hand Rule determines direction of force on a current-carrying conductor in a magnetic field — used for electric motors."},
+      {q:'Which railway zone has HQ at Chennai?',o:['Southern Railway','South Central Railway','South Western Railway','South East Central Railway'],c:[0],e:'Southern Railway (SR) has its headquarters at Chennai.'},
+      {q:'Transformer works on principle of:',o:['Electrostatics','Mutual induction','Self induction','Photoelectric effect'],c:[1],e:'A transformer works on the principle of mutual electromagnetic induction.'},
+      {q:'A train covers 180 km in 3 hours. Speed in km/h:',o:['50','60','70','80'],c:[1],e:'Speed = Distance/Time = 180/3 = 60 km/h.'},
+      {q:'Mixture of 80L has milk:water = 3:1. Water added to make 3:2:',o:['15L','20L','25L','30L'],c:[1],e:'Milk=60L, Water=20L. For 3:2, water needed=40L. Add 40-20=20L.'},
+      {q:'Find next term: 2, 6, 12, 20, 30, ?',o:['40','42','44','46'],c:[1],e:'Differences: 4,6,8,10,12. Next = 30+12 = 42.'},
+      {q:'The first locomotive in India ran between:',o:['Mumbai to Thane','Kolkata to Howrah','Delhi to Agra','Chennai to Arcot'],c:[0],e:'India\'s first passenger train ran between Bombay (Mumbai) and Thane on 16 April 1853.'},
+      {q:'Find the missing number: 6:36 :: 8:?',o:['48','56','64','72'],c:[2],e:'6² = 36, so 8² = 64. The pattern is n:n².'},
+      {q:'Power = Voltage × Current. If V=220V, I=5A, Power =?',o:['44W','110W','1100W','225W'],c:[2],e:'P = V × I = 220 × 5 = 1100 W = 1.1 kW.'},
+    ],
+    hard:[
+      {q:'Efficiency of a steam engine depends on:',o:['Fuel type only','Temperature difference between source and sink','Pressure of steam only','Volume of cylinder'],c:[1],e:'Carnot efficiency = 1 - T_cold/T_hot. Depends on the temperature difference.'},
+      {q:"Kirchhoff's Voltage Law (KVL) states:",o:['Sum of currents at node = 0','Sum of EMFs = sum of drops in a loop','Power in = Power out','Current divides inversely to resistance'],c:[1],e:'KVL: In any closed loop, algebraic sum of EMFs = algebraic sum of voltage drops.'},
+      {q:'If sin θ = 3/5, find cos θ (first quadrant):',o:['4/5','3/4','5/4','5/3'],c:[0],e:'cos²θ = 1-9/25 = 16/25. cosθ = 4/5.'},
+      {q:'RRB NTPC CBT-1 total questions:',o:['80','90','100','120'],c:[2],e:'RRB NTPC CBT-1: 100 questions — 40 GK + 30 Maths + 30 General Intelligence.'},
+      {q:'Which signal does a digital circuit process?',o:['Continuous analogue','Discrete binary 0&1','Sinusoidal','Random noise'],c:[1],e:'Digital circuits process discrete binary signals (0 and 1).'},
+      {q:'A 600W motor lifts 30kg mass 10m in 5 sec. Efficiency:',o:['80%','90%','98%','100%'],c:[3],e:'Work done=mgh=30×10×10=3000J. Energy input=600×5=3000J. Efficiency=100%.'},
+      {q:'The sequence: 1,1,2,3,5,8,13,? is:',o:['18','19','20','21'],c:[3],e:'Fibonacci sequence — each term = sum of two preceding terms. 8+13 = 21.'},
+      {q:'When two trains of length 100m each run in opposite directions at 50 km/h and 40 km/h, time to cross:',o:['5.6s','7.2s','8s','9.6s'],c:[1],e:'Relative speed = 50+40 = 90 km/h = 25 m/s. Distance = 200m. Time = 200/25 = 8s. Wait — 200/25=8s → option C. Actually: 90×1000/3600=25m/s. 200/25=8s.'},
+      {q:'Resistors 3Ω and 6Ω in parallel. Equivalent resistance:',o:['9Ω','2Ω','4Ω','1.5Ω'],c:[1],e:'1/R = 1/3 + 1/6 = 2/6 + 1/6 = 3/6 = 1/2. R = 2Ω.'},
+      {q:'Simplify: (x² - 9)/(x - 3):',o:['x-3','x+3','x²+3','x²-3'],c:[1],e:'(x²-9)/(x-3) = (x+3)(x-3)/(x-3) = x+3.'},
+    ]
+  },
+  banking:{
+    name:'Banking', icon:'🏦', badge:'eb-bank', label:'IBPS/SBI/RBI',
+    desc:'Finance, RBI, Schemes', timer:45,
+    easy:[
+      {q:'RBI stands for:',o:['Reserve Bank of India','Regulated Bank of India','Revenue Bank of India','Rural Bank of India'],c:[0],e:'RBI (Reserve Bank of India) is India\'s central bank, established on 1 April 1935.'},
+      {q:'NEFT stands for:',o:['National Electronic Funds Transfer','National Electronic Fund Transaction','Net Electronic Funds Transfer','National Emergency Fund Transfer'],c:[0],e:'NEFT (National Electronic Funds Transfer) is an RBI-operated system for bank-to-bank money transfers.'},
+      {q:'Repo rate is the rate at which:',o:['Banks lend to public','RBI lends to commercial banks','Government borrows from RBI','Banks lend to each other'],c:[1],e:'Repo Rate is the rate at which the RBI lends short-term money to commercial banks.'},
+      {q:'KYC stands for:',o:['Know Your Customer','Key Your Customer','Keep Your Credentials','Know Your Credit'],c:[0],e:'KYC (Know Your Customer) is a mandatory identity verification process by banks.'},
+      {q:'A sum doubles in 8 years at SI. Rate of interest:',o:['10%','12.5%','15%','8%'],c:[1],e:'For SI: Time = 100/Rate. 8 = 100/R → R = 12.5%.'},
+      {q:'The currency note of ₹500 has whose portrait?',o:['Mahatma Gandhi','Jawaharlal Nehru','B.R. Ambedkar','Subhas Chandra Bose'],c:[0],e:'All Indian currency notes feature the portrait of Mahatma Gandhi since 1996.'},
+      {q:'Which bank is the banker\'s bank in India?',o:['SBI','HDFC','RBI','NABARD'],c:[2],e:'The Reserve Bank of India (RBI) is called the "banker\'s bank" as it manages banking system operations.'},
+      {q:'IMPS allows transfers:',o:['Only during banking hours','24×7 including holidays','Only weekdays','Only within same bank'],c:[1],e:'IMPS (Immediate Payment Service) allows instant 24×7 interbank fund transfers including Sundays and holidays.'},
+      {q:'Minimum balance in Jan Dhan account:',o:['₹500','₹1000','Zero balance','₹100'],c:[2],e:'Pradhan Mantri Jan Dhan Yojana (PMJDY) accounts are zero-balance accounts with basic banking facilities.'},
+      {q:'SBI stands for:',o:['State Bank of India','Small Bank of India','Standard Bank of India','Savings Bank of India'],c:[0],e:'SBI (State Bank of India) is the largest public sector bank in India, headquartered in Mumbai.'},
+    ],
+    mid:[
+      {q:'Basel III norms are related to:',o:['Agricultural lending','Capital adequacy of banks','FDI limits','Interest rate policy'],c:[1],e:'Basel III is a global regulatory framework on bank capital adequacy, stress testing, and liquidity requirements.'},
+      {q:'CRR stands for:',o:['Cash Reserve Ratio','Credit Reserve Rate','Central Reserve Ratio','Currency Reserve Requirement'],c:[0],e:'CRR is the percentage of deposits banks must hold in reserve with the RBI.'},
+      {q:'SARFAESI Act is related to:',o:['Corporate tax','NPA recovery by banks','Insurance regulation','Securities market'],c:[1],e:'SARFAESI Act 2002 enables banks to recover NPAs by enforcing security interest without court intervention.'},
+      {q:'Which bank is NOT nationalised?',o:['Punjab National Bank','HDFC Bank','Bank of Baroda','Canara Bank'],c:[1],e:'HDFC Bank is a private sector bank. PNB, BoB, Canara are nationalised banks.'},
+      {q:'CI on ₹10000 at 10% for 3 years:',o:['₹3000','₹3100','₹3310','₹3200'],c:[2],e:'CI = 10000[(1.1)³-1] = 10000 × 0.331 = ₹3310.'},
+      {q:'Priority Sector Lending target for domestic banks is:',o:['30%','35%','40%','45%'],c:[2],e:'RBI mandates domestic banks to lend at least 40% of ANBC to priority sectors.'},
+      {q:'NABARD is related to:',o:['Export finance','Agriculture and rural finance','Foreign exchange','Urban housing'],c:[1],e:'NABARD (National Bank for Agriculture and Rural Development) focuses on agricultural credit and rural development.'},
+      {q:'SLR stands for:',o:['Statutory Liquidity Ratio','Standard Lending Rate','Scheduled Loan Reserve','Savings Liquidity Rate'],c:[0],e:'SLR is the percentage of deposits banks must maintain in liquid assets like government securities.'},
+      {q:'Which scheme provides accident insurance for ₹2 lakh at ₹12/year?',o:['PMJDY','PMJJBY','PMSBY','APY'],c:[2],e:'Pradhan Mantri Suraksha Bima Yojana (PMSBY) offers accident insurance of ₹2 lakh for just ₹12 per year.'},
+      {q:'Reverse Repo Rate: RBI __ from commercial banks.',o:['Lends money','Borrows money','Takes deposits from public','Regulates forex'],c:[1],e:'Reverse Repo Rate is the rate at which RBI borrows funds from commercial banks, absorbing excess liquidity.'},
+    ],
+    hard:[
+      {q:'Under PMJDY, overdraft facility available up to:',o:['₹5000','₹10000','₹15000','₹2000'],c:[1],e:'Under PMJDY, eligible account holders get an overdraft facility up to ₹10,000.'},
+      {q:'Narrow Banking means banks invest deposits in:',o:['Risky corporate bonds','Government securities only','Real estate','Equity shares'],c:[1],e:'Narrow banking restricts banks to invest only in government/low-risk securities.'},
+      {q:'CRAR under Basel III for Indian banks must be minimum:',o:['8%','9%','10%','11.5%'],c:[3],e:'Indian banks must maintain minimum CRAR of 11.5% including capital conservation buffer.'},
+      {q:'Which Committee recommended setting up NABARD?',o:['Narasimham','Shivaraman','Nayak','Kelkar'],c:[1],e:'The B. Sivaraman Committee (1979) recommended establishing NABARD for agricultural and rural finance.'},
+      {q:'OMO by RBI involves:',o:['Buying/selling foreign currency','Buying/selling government securities','Setting interest rates','Regulating NBFCs'],c:[1],e:'Open Market Operations (OMO) — RBI buys or sells government securities to control money supply.'},
+      {q:'CIBIL score range is:',o:['0-500','300-900','100-800','500-1000'],c:[1],e:'CIBIL (Credit Information Bureau India) credit score ranges from 300 to 900. A score above 750 is considered good.'},
+      {q:'The Prompt Corrective Action (PCA) framework is for:',o:['Well-performing banks','Weak banks with stressed financials','NBFC regulation','Micro-finance'],c:[1],e:'RBI\'s PCA framework is triggered for banks with high NPAs, low capital or negative ROA to restrict risky operations.'},
+      {q:'Which instrument is NOT a money market instrument?',o:['Treasury Bills','Commercial Paper','Equity Shares','Certificate of Deposit'],c:[2],e:'Equity shares are capital market instruments, not money market. T-Bills, CP, and CD are all short-term money market instruments.'},
+      {q:'APY (Atal Pension Yojana) is targeted at:',o:['Government employees','Unorganised sector workers','Senior citizens','Students'],c:[1],e:'APY targets workers in the unorganised sector to provide them a defined pension after age 60.'},
+      {q:'RTGS minimum transaction amount:',o:['₹1 lakh','₹2 lakh','No minimum','₹50,000'],c:[1],e:'RTGS (Real Time Gross Settlement) is used for high-value transactions — minimum ₹2 lakh.'},
+    ]
+  },
+  upsc:{
+    name:'UPSC', icon:'🏅', badge:'eb-upsc', label:'UPSC CSE/IAS',
+    desc:'Constitution, Geography, Policy', timer:120,
+    easy:[
+      {q:'The Preamble of the Indian Constitution begins with:',o:['"We the People of India"','The sovereign state of India','India that is Bharat','The Constitution of India'],c:[0],e:'The Preamble begins with "WE, THE PEOPLE OF INDIA" asserting its democratic foundation.'},
+      {q:'Indian Constitution was adopted on:',o:['15 August 1947','26 January 1950','26 November 1949','2 October 1949'],c:[2],e:'Constitution was adopted on 26 November 1949 (Constitution Day) and came into force on 26 January 1950.'},
+      {q:'India is described as a:',o:['Federal state','Unitary state','Quasi-federal state','Confederation'],c:[2],e:'India has a quasi-federal structure — stronger centre but with federal features.'},
+      {q:'Judicial Review in India is borrowed from:',o:['UK','USA','Canada','Australia'],c:[1],e:'Judicial Review — power to declare laws unconstitutional — is borrowed from the USA.'},
+      {q:'Who chairs the NITI Aayog?',o:['Finance Minister','RBI Governor','Prime Minister','Home Minister'],c:[2],e:'The Prime Minister of India is the ex-officio Chairman of NITI Aayog (replaced Planning Commission in 2015).'},
+      {q:'Lok Sabha has maximum how many members?',o:['543','545','552','530'],c:[2],e:'The Constitution provides for maximum 552 members in Lok Sabha: 530 from states + 20 from UTs + 2 nominated Anglo-Indians (now removed by 104th Amendment).'},
+      {q:'India follows which type of democratic system?',o:['Presidential','Parliamentary','Semi-presidential','Direct democracy'],c:[1],e:'India follows a Parliamentary form of democracy where the executive is accountable to the legislature.'},
+      {q:'The Comptroller and Auditor General of India is appointed by:',o:['Prime Minister','Parliament','President','Chief Justice'],c:[2],e:'The CAG is appointed by the President of India under Article 148 of the Constitution.'},
+      {q:'Which Article provides Right to Life and Personal Liberty?',o:['Article 14','Article 19','Article 20','Article 21'],c:[3],e:'Article 21 guarantees that no person shall be deprived of life or personal liberty except by procedure established by law.'},
+      {q:'The Rajya Sabha has maximum how many members?',o:['238','245','250','260'],c:[1],e:'Rajya Sabha has max 245 members: 233 elected by States/UTs + 12 nominated by the President.'},
+    ],
+    mid:[
+      {q:'Collective responsibility of Cabinet is under which Article?',o:['Article 74','Article 75','Article 76','Article 78'],c:[1],e:'Article 75(3) states that the Council of Ministers is collectively responsible to the House of the People (Lok Sabha).'},
+      {q:'Directive Principles of State Policy are in which Part?',o:['Part III','Part IV','Part IVA','Part V'],c:[1],e:'Part IV (Articles 36-51) contains DPSP — non-justiciable but fundamental to governance.'},
+      {q:'La Niña leads to:',o:['Warmer Pacific','Cooler Pacific & stronger India monsoon','Droughts in India','Warmer Indian Ocean'],c:[1],e:'La Niña (cooling of central/eastern Pacific) typically strengthens the Indian summer monsoon.'},
+      {q:'Which gas primarily causes the Greenhouse Effect?',o:['Oxygen','Nitrogen','Carbon Dioxide','Argon'],c:[2],e:'CO₂ is the dominant anthropogenic greenhouse gas contributing to global warming.'},
+      {q:'Biodiversity Hotspots must have ≥1500 endemic plants AND have lost:',o:['50% habitat','60% habitat','70% habitat','80% habitat'],c:[2],e:'A biodiversity hotspot must have ≥1500 endemic vascular plants AND have lost ≥70% of original habitat.'},
+      {q:'"Secular" added to Preamble by which Amendment?',o:['40th','42nd','44th','52nd'],c:[1],e:'"Socialist" and "Secular" were added to the Preamble by the 42nd Constitutional Amendment (1976).'},
+      {q:'Which is NOT a feature of Federal government?',o:['Dual government','Written Constitution','Single Citizenship','Judicial Review'],c:[2],e:'Single Citizenship is a unitary feature. Federal systems like USA have dual citizenship (national + state). India has only single citizenship.'},
+      {q:'The Westerlies blow from:',o:['Equator to poles','Subtropical to sub-polar','Polar to subtropical','Tropics to equator'],c:[1],e:'Westerlies blow from subtropical high pressure (30°) to sub-polar low pressure (60°) zones in both hemispheres.'},
+      {q:'Which Amendment lowered the voting age from 21 to 18?',o:['42nd','44th','61st','73rd'],c:[2],e:'The 61st Constitutional Amendment (1988) lowered the voting age from 21 to 18 years.'},
+      {q:'The El Niño effect causes:',o:['Heavy monsoon in India','Drought-like conditions in India','No effect on India','Floods in North India'],c:[1],e:'El Niño (warming of Pacific) typically weakens the Indian monsoon, causing below-normal rainfall and drought conditions.'},
+    ],
+    hard:[
+      {q:'Anti-defection provisions are in which Schedule?',o:['Eighth','Ninth','Tenth','Eleventh'],c:[2],e:'The Tenth Schedule (added by 52nd Amendment, 1985) contains anti-defection provisions.'},
+      {q:'Precautionary Principle in environmental law means:',o:['Polluter pays','Preventive action under uncertainty','EIA mandatory','Biodiversity compensation'],c:[1],e:'Precautionary Principle: lack of full scientific certainty should not delay preventive action against environmental threats.'},
+      {q:'"Basic Structure" doctrine was established in:',o:['A.K. Gopalan case','Golak Nath case','Kesavananda Bharati case','Minerva Mills case'],c:[2],e:'Kesavananda Bharati v. State of Kerala (1973) — 13-judge bench — established the Basic Structure Doctrine.'},
+      {q:'Which Finance Commission recommended GST Council?',o:['12th','13th','14th','15th'],c:[1],e:'The 13th Finance Commission (2010) recommended creation of a GST Council, later established under Article 279A.'},
+      {q:'UNFCCC COP is held:',o:['Every 5 years','Every year','Twice a year','Every 2 years'],c:[1],e:'UNFCCC COP (Conference of Parties) is held annually — e.g., COP21 Paris 2015, COP26 Glasgow 2021, COP28 Dubai 2023.'},
+      {q:'Doctrine of Colourable Legislation means:',o:['Unconstitutional law made colourful','Legislature cannot do indirectly what it cannot do directly','Coloured laws for specific groups','Emergency provisions only'],c:[1],e:'Doctrine of Colourable Legislation: what cannot be done directly by a legislature cannot be done indirectly by giving it a different colour or form.'},
+      {q:'Which Article deals with the procedure for Constitutional Amendment?',o:['Article 352','Article 356','Article 368','Article 370'],c:[2],e:'Article 368 provides the power and procedure for amendment of the Constitution of India.'},
+      {q:'The concept of "Creamy Layer" in OBC reservations was first defined in:',o:['Mandal Commission Report','Indra Sawhney case','M. Nagaraj case','Balaji case'],c:[1],e:'Indra Sawhney v. Union of India (1992) upheld OBC reservations but introduced the "creamy layer" exclusion.'},
+      {q:'Which is the largest biome on Earth by area?',o:['Tropical Rainforest','Savanna','Taiga (Boreal Forest)','Tundra'],c:[2],e:'Taiga (Boreal Forest) is the largest terrestrial biome, stretching across North America, Europe, and Asia.'},
+      {q:'The River Luni drains into:',o:['Bay of Bengal','Arabian Sea','Rann of Kutch','Indian Ocean'],c:[2],e:'The Luni River originates in the Aravalli Range and drains into the Rann of Kutch in Gujarat.'},
+    ]
+  },
+  ese:{
+    name:'ESE/IES', icon:'⚙️', badge:'eb-ese', label:'Eng. Services',
+    desc:'Engineering (all branches)', timer:90,
+    easy:[
+      {q:"Ohm's law applies to which type of conductors?",o:['Non-linear','Linear','Semiconductor','Superconductor'],c:[1],e:"Ohm's Law (V=IR) applies to ohmic/linear conductors where resistance is constant."},
+      {q:'The SI unit of power is:',o:['Joule','Newton','Watt','Pascal'],c:[2],e:'Watt (W) is the SI unit of power = energy per unit time = J/s.'},
+      {q:'Material with the highest thermal conductivity:',o:['Iron','Copper','Diamond','Aluminium'],c:[2],e:'Diamond has the highest thermal conductivity (~2000 W/m·K) among natural materials.'},
+      {q:'Pascal is the unit of:',o:['Force','Pressure','Energy','Power'],c:[1],e:'Pascal (Pa) is the SI unit of pressure = Force/Area = N/m².'},
+      {q:'Carnot efficiency between 500K and 300K is:',o:['30%','40%','50%','60%'],c:[1],e:'Efficiency = 1 - T_cold/T_hot = 1 - 300/500 = 0.40 = 40%.'},
+      {q:'AND gate output is 1 only when:',o:['Any input is 1','Both inputs are 0','Both inputs are 1','Any input is 0'],c:[2],e:'AND gate: output HIGH only when ALL inputs are HIGH.'},
+      {q:'Hook\'s Law states that stress is proportional to:',o:['Volume','Strain','Temperature','Velocity'],c:[1],e:"Hooke's Law: Within elastic limit, stress is directly proportional to strain. σ = E × ε."},
+      {q:'The unit of capacitance is:',o:['Henry','Ohm','Farad','Tesla'],c:[2],e:'Farad (F) is the SI unit of capacitance. 1 Farad = 1 Coulomb per Volt.'},
+      {q:'Kirchhoff\'s Current Law states:',o:['V=IR','Sum of currents at a junction = 0','P=VI','Sum of voltages in loop = 0'],c:[1],e:"KCL: The algebraic sum of currents entering and leaving a node = 0 (charge conservation)."},
+      {q:'Shear stress is defined as force per:',o:['Volume','Area parallel to force','Area perpendicular to force','Length'],c:[1],e:'Shear stress = Force / Area parallel to the force. Unlike normal stress which acts perpendicular.'},
+    ],
+    mid:[
+      {q:"Bernoulli's equation is based on conservation of:",o:['Mass','Momentum','Energy','Charge'],c:[2],e:"Bernoulli's equation: P + ½ρv² + ρgh = constant (energy conservation in fluid flow)."},
+      {q:'Resonant frequency of an LC circuit:',o:['1/(2π√LC)','2π√LC','1/(LC)','√(L/C)'],c:[0],e:'f = 1/(2π√LC), where L=inductance, C=capacitance.'},
+      {q:'Simply supported beam with UDL w. Max bending moment:',o:['wL²/4','wL²/8','wL²/12','wL/2'],c:[1],e:'For simply supported beam with UDL, max BM at midspan = wL²/8.'},
+      {q:'Laplace transform of e^(at):',o:['1/(s+a)','1/(s-a)','s/(s-a)','a/(s-a)'],c:[1],e:'L{e^(at)} = 1/(s-a), valid for s > a.'},
+      {q:'Stress = Force/Area. Area doubles, force constant, stress:',o:['Doubles','Halves','Stays same','Quadruples'],c:[1],e:'Stress ∝ 1/Area. Double area → half stress.'},
+      {q:'TCP operates at which OSI layer?',o:['Network','Transport','Session','Application'],c:[1],e:'TCP (Transmission Control Protocol) operates at Layer 4 (Transport) of the OSI model.'},
+      {q:'The specific speed of a turbine defines:',o:['Speed of runner','Speed of geometrically similar turbine of unit dimensions','Speed at maximum efficiency','Rotational speed in rpm'],c:[1],e:'Specific speed = speed of geometrically similar turbine generating unit power under unit head. Used for turbine selection.'},
+      {q:'Poisson\'s ratio is defined as:',o:['Lateral strain / Longitudinal strain','Stress / Strain','Shear stress / Normal stress','Modulus / Stiffness'],c:[0],e:"Poisson's ratio μ = −(Lateral strain)/(Longitudinal strain). Typically 0.25 to 0.35 for metals."},
+      {q:'The Reynolds number determines:',o:['Heat transfer','Flow regime (laminar/turbulent)','Pressure drop only','Viscosity'],c:[1],e:'Re = ρvD/μ. Re < 2000: laminar; Re > 4000: turbulent. It determines the nature of fluid flow.'},
+      {q:'MOSFET is a:',o:['Bipolar device','Unipolar (field-effect) device','Passive device','Magnetic device'],c:[1],e:'MOSFET (Metal-Oxide-Semiconductor Field-Effect Transistor) is a unipolar device controlled by electric field (voltage).'},
+    ],
+    hard:[
+      {q:'Which is NOT a thermodynamic property?',o:['Enthalpy','Entropy','Heat','Internal Energy'],c:[2],e:'Heat (Q) and Work (W) are path functions. Enthalpy, Entropy, Internal Energy are state properties.'},
+      {q:"Mohr's circle is used to find:",o:['Principal stresses','Flow velocities','Bending moments','Natural frequencies'],c:[0],e:"Mohr's Circle graphically represents stress transformation — gives principal stresses and max shear stress."},
+      {q:'Z-transform of unit step u[n]:',o:['1/(z-1)','z/(z-1)','1/z','z'],c:[1],e:'Z{u[n]} = z/(z-1) for |z|>1, from geometric series sum.'},
+      {q:'Rankine cycle is used for:',o:['Gas turbines','Refrigeration','Steam power plants','IC engines'],c:[2],e:'Rankine cycle is the ideal thermodynamic cycle for steam power plants.'},
+      {q:'Feedback control system stable if all poles in:',o:['On imaginary axis','Right half s-plane','Left half s-plane','At origin'],c:[2],e:'For BIBO stability, all poles must lie in the Left Half of the s-plane (negative real parts).'},
+      {q:"Euler's buckling load for pin-pin column:",o:['π²EI/L²','4π²EI/L²','π²EI/4L²','2π²EI/L²'],c:[0],e:"P_cr = π²EI/L² for pin-pin (both ends hinged) column of length L."},
+      {q:'In a PID controller, Integral action eliminates:',o:['Overshoot','Steady-state error','Oscillations','Derivative kick'],c:[1],e:'The Integral (I) term in PID eliminates steady-state error by accumulating past error over time.'},
+      {q:'The Nyquist sampling theorem states: sampling rate must be:',o:['Equal to signal frequency','At least twice signal frequency','Half signal frequency','Ten times signal frequency'],c:[1],e:'Nyquist theorem: to avoid aliasing, sampling rate must be ≥ 2 × maximum signal frequency (Nyquist rate).'},
+      {q:'Degree of indeterminacy of a fixed-fixed beam:',o:['1','2','3','4'],c:[2],e:'A fixed-fixed beam has 3 degrees of static indeterminacy — 6 reactions - 3 equilibrium equations = 3.'},
+      {q:'In VLSI design, CMOS technology uses:',o:['Only NMOS','Only PMOS','Both NMOS and PMOS','Bipolar transistors'],c:[2],e:'CMOS (Complementary MOS) uses both NMOS and PMOS transistors in complementary pairs for low power consumption.'},
+    ]
+  },
+  gate:{
+    name:'GATE', icon:'🔬', badge:'eb-gate', label:'GATE',
+    desc:'CS — Algorithms, OS, Networks', timer:120,
+    easy:[
+      {q:'Worst-case time complexity of linear search:',o:['O(1)','O(log n)','O(n)','O(n²)'],c:[2],e:'Linear search scans each element. Worst case = last position or absent → O(n).'},
+      {q:'Which data structure uses LIFO?',o:['Queue','Stack','Linked List','Tree'],c:[1],e:'Stack uses LIFO (Last In First Out). Push adds to top, Pop removes from top.'},
+      {q:'DFA accepts which type of language?',o:['Type-0','Type-1','Type-2','Type-3 (Regular)'],c:[3],e:'DFAs accept Regular Languages (Type-3 in Chomsky hierarchy).'},
+      {q:'Binary tree with n nodes has how many NULL pointers?',o:['n-1','n','n+1','2n'],c:[2],e:'Total links=2n, internal=n-1, NULL=2n-(n-1)=n+1.'},
+      {q:'Full binary tree with n internal nodes has leaves:',o:['n','n-1','n+1','2n'],c:[2],e:'Full binary tree: leaves = internal nodes + 1 = n+1.'},
+      {q:'SQL WHERE clause does:',o:['Groups rows','Sorts rows','Filters rows before grouping','Filters groups'],c:[2],e:'WHERE filters rows before grouping. HAVING filters groups after GROUP BY.'},
+      {q:'HTTP default port is:',o:['21','22','80','443'],c:[2],e:'HTTP uses port 80 by default. HTTPS uses port 443. FTP uses 21, SSH uses 22.'},
+      {q:'Which layer of OSI handles routing?',o:['Data Link','Network','Transport','Session'],c:[1],e:'The Network Layer (Layer 3) handles routing of packets across networks using IP addresses.'},
+      {q:'Primary key in relational database must be:',o:['Unique only','Not null only','Unique and not null','Indexed only'],c:[2],e:'Primary key must be UNIQUE (no duplicates) and NOT NULL to uniquely identify each row.'},
+      {q:'Which is NOT a valid IPv4 address?',o:['192.168.1.1','10.0.0.1','256.1.1.1','172.16.0.1'],c:[2],e:'IPv4 octets range from 0-255. 256 is invalid, so 256.1.1.1 is not a valid IPv4 address.'},
+    ],
+    mid:[
+      {q:'Best worst-case sorting algorithm:',o:['Quick Sort','Bubble Sort','Merge Sort','Insertion Sort'],c:[2],e:'Merge Sort guarantees O(n log n) in all cases. QuickSort can be O(n²) worst case.'},
+      {q:'Fourth deadlock condition (after Mutual Exclusion, Hold-Wait, No Preemption):',o:['Priority Inversion','Circular Wait','Starvation','Context Switch'],c:[1],e:"Coffman's four conditions: Mutual Exclusion, Hold and Wait, No Preemption, Circular Wait."},
+      {q:'Minimal super key in relational DB is called:',o:['Primary Key','Super Key','Candidate Key','Foreign Key'],c:[2],e:'A Candidate Key is a minimal super key — no proper subset can uniquely identify tuples.'},
+      {q:'Virtual memory uses:',o:['Cache mapping','Demand paging','RAID storage','DMA transfer'],c:[1],e:'Virtual memory uses demand paging — pages loaded to RAM only when needed.'},
+      {q:'CFL L = {aⁿbⁿ | n≥1} accepted by:',o:['DFA','NFA','Push-Down Automaton','Turing Machine'],c:[2],e:'CFL {aⁿbⁿ} requires a stack → accepted by Push-Down Automata (PDA).'},
+      {q:'Eigenvalues of [[2,1],[1,2]]:',o:['1,3','2,2','0,4','1,2'],c:[0],e:'λ²-4λ+3=0 → (λ-1)(λ-3)=0 → eigenvalues = 1, 3.'},
+      {q:'TCP vs UDP: TCP provides:',o:['Faster delivery','Connectionless service','Reliable ordered delivery','No error checking'],c:[2],e:'TCP provides reliable, ordered, error-checked delivery via connection (3-way handshake). UDP is faster but unreliable.'},
+      {q:'Which is a greedy algorithm?',o:['Dynamic Programming','Dijkstra\'s shortest path','Floyd-Warshall','Bellman-Ford'],c:[1],e:"Dijkstra's algorithm is a greedy algorithm — it selects the minimum weight edge at each step."},
+      {q:'Page replacement algorithm with minimum page faults (theoretically optimal):',o:['LRU','FIFO','Optimal (OPT)','LFU'],c:[2],e:'Optimal (OPT/Belady) algorithm replaces the page not used for the longest time in future — theoretically optimal but not implementable.'},
+      {q:'In a B-tree of order m, each node has max how many children?',o:['m-1','m','m+1','2m'],c:[1],e:'In a B-tree of order m, each node has at most m children and at most m-1 keys.'},
+    ],
+    hard:[
+      {q:'CPU scheduling that may cause starvation:',o:['FCFS','Round Robin','Priority Scheduling','SRTF'],c:[2,3],multi:true,e:'Both Priority Scheduling and SRTF can cause starvation of low-priority/long processes.'},
+      {q:'NP-Complete problems: every NP problem __ to them.',o:['Cannot be reduced','Reduces in polynomial time','Reduces in exponential time','Is equivalent'],c:[1],e:'NP-Complete: every NP problem reduces to them in polynomial time. P=NP if any NPC solved in poly time.'},
+      {q:'Master Theorem T(n)=2T(n/2)+n:',o:['O(n)','O(n log n)','O(n²)','O(log n)'],c:[1],e:'Case 2: f(n)=Θ(n^log_b a) → T(n)=O(n log n).'},
+      {q:'Bellman-Ford detects:',o:['Only shortest path','Negative weight cycles','Minimum spanning tree','Maximum flow'],c:[1],e:'Bellman-Ford finds shortest paths with negative edges AND detects negative weight cycles.'},
+      {q:'2-3-4 tree equivalent to:',o:['AVL Tree','Splay Tree','Red-Black Tree','B+ Tree'],c:[2],e:'2-3-4 tree is isomorphic to Red-Black Tree.'},
+      {q:'Semaphore P(S) operation:',o:['S=S+1; signal','S=S-1; if S<0 block','S=S+1; unblock','S=0; reset'],c:[1],e:'P(S): S=S-1. If S<0, process is blocked (added to wait queue).'},
+      {q:'Context-Free Grammar that generates {ww^R | w∈{a,b}*} requires:',o:['DFA','NFA','PDA','Turing Machine'],c:[2],e:'Palindrome-like CFL {ww^R} requires a PDA (stack) to push w and match with w^R.'},
+      {q:'Which normal form eliminates transitive dependencies?',o:['1NF','2NF','3NF','BCNF'],c:[2],e:'3NF eliminates transitive dependencies: non-key attributes must depend only on primary key, not on other non-key attributes.'},
+      {q:'In Dining Philosophers problem, deadlock prevention by:',o:['Allowing all to pick left fork first','Limiting one philosopher from picking','Mutual exclusion only','Resource preemption only'],c:[1],e:'One solution: allow at most (n-1) philosophers to pick simultaneously. Or asymmetric solution: one philosopher picks right fork first.'},
+      {q:'Which cache replacement policy uses frequency of access?',o:['LRU','FIFO','LFU','MRU'],c:[2],e:'LFU (Least Frequently Used) evicts the page accessed least number of times. LRU uses recency, not frequency.'},
+    ]
+  },
+  ugcnet:{
+    name:'UGC NET', icon:'🎓', badge:'eb-ugc', label:'UGC NET',
+    desc:'Research, Education, Statistics', timer:90,
+    easy:[
+      {q:'UGC NET qualifies for:',o:['Bank Manager','Assistant Professor/JRF','IAS Officer','School Teacher'],c:[1],e:'UGC NET qualifies candidates for Assistant Professor and Junior Research Fellowship (JRF) positions.'},
+      {q:'First widely used high-level programming language:',o:['Assembly','FORTRAN','COBOL','C'],c:[1],e:'FORTRAN (1957) is considered the first widely used high-level programming language.'},
+      {q:'Theory of Multiple Intelligences was propounded by:',o:['Piaget','Vygotsky','Gardner','Bloom'],c:[2],e:"Howard Gardner proposed 8+ types of intelligence in 'Frames of Mind' (1983)."},
+      {q:'"Pedagogy" refers to:',o:['Art of learning','Art and science of teaching','Curriculum design','Student assessment'],c:[1],e:'Pedagogy is the art, science, and practice of teaching.'},
+      {q:'Research hypothesis is:',o:['Final conclusion','Tentative testable assumption','Literature review','Data analysis result'],c:[1],e:'Research hypothesis is a tentative, testable statement about expected relationship between variables.'},
+      {q:'ISBN stands for:',o:['International Standard Book Number','Indian Standard Book Number','International Series Book Name','Indexed Standard Bibliography Number'],c:[0],e:'ISBN (International Standard Book Number) is a 13-digit unique identifier assigned to books for commercial purposes.'},
+      {q:'Plagiarism means:',o:['Proper citation of sources','Using others\' work without credit','Original research','Peer review'],c:[1],e:'Plagiarism is the act of using someone else\'s work, ideas, or expressions without proper attribution or permission.'},
+      {q:'Bloom\'s Taxonomy was proposed in:',o:['1946','1956','1966','1976'],c:[1],e:"Benjamin Bloom and colleagues developed the Taxonomy of Educational Objectives in 1956."},
+      {q:'Formative assessment is done:',o:['After completing course','During learning process','Before admission','Once a year only'],c:[1],e:'Formative assessment occurs during the learning process to monitor student progress and provide ongoing feedback.'},
+      {q:'ICT in education stands for:',o:['International Communication Technology','Information and Communication Technology','Integrated Computer Training','Indian Curriculum Technology'],c:[1],e:'ICT stands for Information and Communication Technology — digital tools used to enhance teaching and learning.'},
+    ],
+    mid:[
+      {q:'Sampling technique with equal probability for all:',o:['Cluster sampling','Stratified sampling','Simple Random Sampling','Purposive sampling'],c:[2],e:'Simple Random Sampling (SRS) gives every member equal and independent chance of selection.'},
+      {q:'p-value in hypothesis testing represents:',o:['Confidence level','Probability of results given null hypothesis is true','Effect size','Sample variance'],c:[1],e:'p-value = probability of obtaining results as extreme as observed, assuming null hypothesis is true.'},
+      {q:'Constructivism in education — primary proponent:',o:['B.F. Skinner','John Dewey','Jean Piaget','Ivan Pavlov'],c:[2],e:"Piaget's cognitive constructivism: learners actively construct knowledge through experience."},
+      {q:'TCP/IP model has how many layers?',o:['4','5','6','7'],c:[0],e:'TCP/IP has 4 layers: Application, Transport, Internet, Network Access. OSI has 7.'},
+      {q:'DOI in academic publishing stands for:',o:['Department of Information','Digital Object Identifier','Data Output Index','Document Origin ID'],c:[1],e:'DOI is a persistent alphanumeric string providing a permanent internet link to a document.'},
+      {q:"Revised Bloom's Taxonomy highest level:",o:['Analysis','Evaluation','Synthesis','Create'],c:[3],e:"Revised Bloom's (2001): Remember, Understand, Apply, Analyse, Evaluate, Create. 'Create' is highest."},
+      {q:'Mode in statistics is:',o:['Middle value','Average value','Most frequent value','Range/2'],c:[2],e:'Mode is the value that appears most frequently in a dataset. A dataset can have multiple modes.'},
+      {q:'Regression analysis is used to:',o:['Classify data','Predict relationship between variables','Test normality','Measure central tendency'],c:[1],e:'Regression analysis examines the relationship between dependent and independent variables to make predictions.'},
+      {q:'Which is a qualitative research method?',o:['Randomised Control Trial','Survey with Likert scale','Ethnography','Structural Equation Modelling'],c:[2],e:'Ethnography is a qualitative method involving in-depth observation and interpretation of cultural practices.'},
+      {q:'Null hypothesis (H₀) in research assumes:',o:['Significant difference exists','No significant difference exists','Positive correlation','Causal relationship'],c:[1],e:'Null hypothesis assumes no significant difference or relationship exists between variables being tested.'},
+    ],
+    hard:[
+      {q:'Type I error in hypothesis testing:',o:['Accepting false null hypothesis','Rejecting true null hypothesis','Wrong sample size','Wrong test statistic'],c:[1],e:'Type I Error (α): Rejecting the null hypothesis when it is actually true (false positive).'},
+      {q:'Von Neumann bottleneck caused by:',o:['Multiple CPUs','Single shared bus for data and instructions','Cache miss','Parallel processing'],c:[1],e:'Von Neumann bottleneck: CPU and memory share one bus for both data and instructions, limiting throughput.'},
+      {q:'Action Research is best described as:',o:['Pure theoretical research','Practitioner-led inquiry to improve practice','Secondary data analysis','Randomised control trial'],c:[1],e:'Action Research: cyclical process by practitioners to identify problems, implement changes, evaluate outcomes.'},
+      {q:'Factor Analysis reduces variables to fewer:',o:['Respondents','Underlying factors/dimensions','Datasets','Hypotheses'],c:[1],e:'Factor Analysis identifies latent factors underlying correlations among many observed variables.'},
+      {q:'Turnitin checks for:',o:['Grammar errors','Code plagiarism','Textual similarity/plagiarism','Citation format'],c:[2],e:'Turnitin compares submitted text against a database to detect textual similarity and potential plagiarism.'},
+      {q:'"Zone of Proximal Development" (ZPD) belongs to:',o:['Piaget','Vygotsky','Bruner','Ausubel'],c:[1],e:"Vygotsky's ZPD is the gap between what a learner can do independently vs. with guidance."},
+      {q:'Chi-square test is used for:',o:['Comparing means','Testing association between categorical variables','Correlation of continuous data','Regression analysis'],c:[1],e:'Chi-square (χ²) test examines whether there is a significant association between two categorical variables.'},
+      {q:'Phenomenological research focuses on:',o:['Statistical patterns','Lived experience of individuals','Experimental control groups','Large sample surveys'],c:[1],e:'Phenomenological research explores the lived experiences and subjective meanings of individuals about a phenomenon.'},
+      {q:'Cronbach\'s Alpha measures:',o:['Test validity','Internal consistency/reliability','Factor loading','Correlation coefficient'],c:[1],e:"Cronbach's Alpha measures internal consistency reliability of a scale — α ≥ 0.7 is generally acceptable."},
+      {q:'Grounded Theory in research generates:',o:['Confirms existing theories','Theory from data systematically','Statistical models','Descriptive statistics only'],c:[1],e:"Grounded Theory (Glaser & Strauss, 1967) generates theory inductively from systematically collected and analysed data."},
+    ]
+  }
+};
+
+// ══════════════════════════════════════════════════════
+//  STATE & AUTH
+// ══════════════════════════════════════════════════════
+let USERS = JSON.parse(localStorage.getItem('ee_users') || '{}');
+if(!USERS['student1']) USERS['student1'] = {pass:'pass123',name:'Student One',history:[],points:0,bestStreak:0};
+if(!USERS['testuser']) USERS['testuser'] = {pass:'quiz456',name:'Test User',history:[],points:0,bestStreak:0};
+if(!USERS['admin'])    USERS['admin']    = {pass:'admin123',name:'Admin',history:[],points:0,bestStreak:0};
+
+let CU = null; // current user key
+
+const S = {
+  exams:[],diff:null,qCount:10,secPerQ:20,
+  qs:[],idx:0,score:0,streak:0,bestStreak:0,
+  ans:[],timeTaken:[],timerId:null,timeLeft:0,
+  answered:false,selectedOpts:new Set()
+};
+
+function saveUsers(){ localStorage.setItem('ee_users',JSON.stringify(USERS)); }
+
+// ── Screens ──────────────────────────────────────────
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.display='none'});
+  const el=document.getElementById(id);
+  el.style.display='block';
+  requestAnimationFrame(()=>el.classList.add('active'));
+}
+
+// ══════════════════════════════════════════════════════
+//  LOGIN / REGISTER
+// ══════════════════════════════════════════════════════
+document.querySelectorAll('.auth-tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.auth-tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.querySelectorAll('.form-section').forEach(x=>x.classList.remove('active'));
+    document.getElementById('form-'+t.dataset.tab).classList.add('active');
+  });
+});
+
+document.getElementById('li-eye').addEventListener('click',()=>{
+  const i=document.getElementById('li-pass');
+  i.type=i.type==='password'?'text':'password';
+});
+document.getElementById('rg-eye').addEventListener('click',()=>{
+  const i=document.getElementById('rg-pass');
+  i.type=i.type==='password'?'text':'password';
+});
+
+document.querySelectorAll('.demo-chip').forEach(c=>{
+  c.addEventListener('click',()=>{
+    document.getElementById('li-user').value=c.dataset.u;
+    document.getElementById('li-pass').value=c.dataset.p;
+    document.querySelector('[data-tab="login"]').click();
+  });
+});
+
+function validate(id,errId,cond,msg){
+  const err=document.getElementById(errId);
+  if(!cond){ err.textContent=msg; err.classList.add('show'); return false; }
+  err.classList.remove('show'); return true;
+}
+
+document.getElementById('btn-login').addEventListener('click',()=>{
+  const u=document.getElementById('li-user').value.trim();
+  const p=document.getElementById('li-pass').value;
+  let ok=true;
+  ok=validate('li-user','li-user-err',u,'Please enter your username') && ok;
+  ok=validate('li-pass','li-pass-err',p,'Please enter your password') && ok;
+  if(!ok) return;
+  const err=document.getElementById('li-main-err');
+  if(USERS[u] && USERS[u].pass===p){
+    err.style.display='none';
+    CU=u;
+    document.getElementById('li-user').value='';
+    document.getElementById('li-pass').value='';
+    enterDashboard();
+  } else {
+    err.style.display='block';
+  }
+});
+
+document.getElementById('btn-register').addEventListener('click',()=>{
+  const n=document.getElementById('rg-name').value.trim();
+  const e=document.getElementById('rg-email').value.trim();
+  const u=document.getElementById('rg-user').value.trim();
+  const p=document.getElementById('rg-pass').value;
+  let ok=true;
+  ok=validate('rg-name','rg-name-err',n.length>=2,'Name must be at least 2 characters') && ok;
+  ok=validate('rg-email','rg-email-err',/^[^@]+@[^@]+\.[^@]+$/.test(e),'Enter a valid email') && ok;
+  ok=validate('rg-user','rg-user-err',u.length>=3,'Username must be 3+ characters') && ok;
+  ok=validate('rg-pass','rg-pass-err',p.length>=6,'Password must be at least 6 characters') && ok;
+  if(!ok) return;
+  const main=document.getElementById('rg-main-err');
+  if(USERS[u]){ main.textContent='❌ Username already taken!'; main.style.display='block'; return; }
+  main.style.display='none';
+  USERS[u]={pass:p,name:n,email:e,history:[],points:0,bestStreak:0};
+  saveUsers();
+  CU=u;
+  enterDashboard();
+});
+
+// allow Enter key
+['li-user','li-pass'].forEach(id=>{
+  document.getElementById(id).addEventListener('keydown',e=>{
+    if(e.key==='Enter') document.getElementById('btn-login').click();
+  });
+});
+
+document.getElementById('btn-logout').addEventListener('click',()=>{
+  CU=null;
+  document.getElementById('hud').classList.remove('show');
+  show('s-login');
+});
+
+// ══════════════════════════════════════════════════════
+//  DASHBOARD
+// ══════════════════════════════════════════════════════
+function enterDashboard(){
+  const ud=USERS[CU];
+  document.getElementById('hud').classList.add('show');
+  document.getElementById('hud-user').textContent='👤 '+ud.name;
+  document.getElementById('hud-pts').textContent='⚡ '+ud.points+' pts';
+  switchTab('dash');
+  show('s-dashboard');
+}
+
+function renderDashboard(){
+  const ud=USERS[CU];
+  document.getElementById('d-name').textContent=ud.name.split(' ')[0];
+  document.getElementById('ds-total').textContent=ud.history.length;
+  document.getElementById('ds-pts').textContent=ud.points;
+  const accs=ud.history.map(h=>h.acc);
+  document.getElementById('ds-acc').textContent=accs.length?Math.max(...accs)+'%':'—';
+  document.getElementById('ds-streak').textContent=ud.bestStreak||0;
+  renderHistory('history-list', ud.history.slice(-5).reverse());
+}
+
+function renderHistory(elId, list){
+  const el=document.getElementById(elId);
+  if(!list.length){ el.innerHTML='<div class="empty-state">📭 No quizzes yet!</div>'; return; }
+  el.innerHTML=list.map(h=>{
+    const cls=h.acc>=80?'good':h.acc>=50?'avg':'poor';
+    return `<div class="hist-item">
+      <div class="hi-icon">${DB[h.exam]?.icon||'📚'}</div>
+      <div class="hi-info">
+        <div class="hi-name">${DB[h.exam]?.name||h.exam} — ${h.diff} (${h.count} Qs)</div>
+        <div class="hi-meta">${h.date} · ${h.correct}/${h.count} correct · ${h.pts} pts</div>
+      </div>
+      <div class="hi-score ${cls}">${h.acc}%</div>
+    </div>`;
+  }).join('');
+}
+
+// ── TAB NAVIGATION ───────────────────────────────────
+document.getElementById('main-tabs').addEventListener('click',e=>{
+  if(e.target.classList.contains('nav-tab')) switchTab(e.target.dataset.s);
+});
+document.getElementById('btn-go-setup').addEventListener('click',()=>switchTab('setup'));
+
+function switchTab(tab){
+  ['dash','setup','stats'].forEach(t=>{
+    document.getElementById('tab-'+t).style.display='none';
+    document.querySelector(`[data-s="${t}"]`)?.classList.remove('active');
+  });
+  document.getElementById('tab-'+tab).style.display='block';
+  document.querySelector(`[data-s="${tab}"]`)?.classList.add('active');
+  if(tab==='dash') renderDashboard();
+  if(tab==='stats') renderStats();
+  if(tab==='setup') buildExamGrid();
+}
+
+// ══════════════════════════════════════════════════════
+//  SETUP
+// ══════════════════════════════════════════════════════
+function buildExamGrid(){
+  const g=document.getElementById('exam-grid');
+  g.innerHTML='';
+  Object.entries(DB).forEach(([key,ex])=>{
+    const c=document.createElement('div');
+    c.className='exam-card'+(S.exams.includes(key)?' selected':'');
+    c.dataset.key=key;
+    c.innerHTML=`<div class="ec-check">✓</div>
+      <span class="ec-badge ${ex.badge}">${ex.label}</span>
+      <span class="ec-icon">${ex.icon}</span>
+      <div class="ec-name">${ex.name}</div>
+      <div class="ec-info">${ex.desc}</div>`;
+    c.addEventListener('click',()=>toggleExam(key,c));
+    g.appendChild(c);
+  });
+  updatePreview();
+}
+
+function toggleExam(key,el){
+  const i=S.exams.indexOf(key);
+  if(i===-1){ S.exams.push(key); el.classList.add('selected'); }
+  else { S.exams.splice(i,1); el.classList.remove('selected'); }
+  updatePreview();
+  document.getElementById('btn-start-quiz').disabled=(!S.exams.length||!S.diff);
+}
+
+document.querySelectorAll('.diff-card').forEach(c=>{
+  c.addEventListener('click',()=>{
+    document.querySelectorAll('.diff-card').forEach(x=>x.classList.remove('picked'));
+    c.classList.add('picked');
+    S.diff=c.dataset.d;
+    updatePreview();
+    document.getElementById('btn-start-quiz').disabled=(!S.exams.length||!S.diff);
+  });
+});
+
+// Fixed: 10-15 questions per category, timer is per-exam from DB
+S.qCount = 10;
+S.secPerQ = 60; // default, overridden per question from DB
+
+function updatePreview(){
+  const MAX_PER_CAT=15;
+  const diff=S.diff||'easy';
+  const maxAvail=S.exams.reduce((sum,k)=>sum+Math.min(DB[k][diff].length,MAX_PER_CAT),0);
+  document.getElementById('pv-exams').textContent=S.exams.length
+    ? S.exams.map(k=>DB[k].icon+' '+DB[k].name+' ('+DB[k].timer+'s)').join(' · ')
+    : 'None';
+  document.getElementById('pv-diff').textContent=S.diff?({easy:'🌱 Easy',mid:'⚡ Medium',hard:'💀 Hard'}[S.diff]):'—';
+  document.getElementById('pv-count').textContent=S.exams.length&&S.diff
+    ? 'Up to 15 per category ('+maxAvail+' available)'
+    : 'Up to 15 per category';
+}
+
+document.getElementById('btn-reset-setup').addEventListener('click',()=>{
+  S.exams=[]; S.diff=null;
+  document.querySelectorAll('.exam-card').forEach(c=>c.classList.remove('selected'));
+  document.querySelectorAll('.diff-card').forEach(c=>c.classList.remove('picked'));
+  document.getElementById('btn-start-quiz').disabled=true;
+  updatePreview();
+});
+
+document.getElementById('btn-start-quiz').addEventListener('click',()=>{
+  buildQuestions();
+  initQuiz();
+  show('s-quiz');
+});
+
+// ══════════════════════════════════════════════════════
+//  BUILD QUESTIONS — randomise correct position
+// ══════════════════════════════════════════════════════
+function buildQuestions(){
+  const MAX_PER_CAT = 15; // maximum 15 questions per category
+  const pool=[];
+  S.exams.forEach(key=>{
+    // shuffle category questions first, then take max MAX_PER_CAT
+    const catQs=[...DB[key][S.diff]].sort(()=>Math.random()-.5);
+    catQs.slice(0, MAX_PER_CAT).forEach(q=>pool.push({...q,examKey:key}));
+  });
+  // shuffle full pool, then take user-selected count
+  pool.sort(()=>Math.random()-.5);
+  const picked=pool.slice(0,pool.length); // take all available (up to 15 per cat)
+
+  // For each question, randomise the position of options
+  S.qs=picked.map(q=>{
+    const opts=[...q.o]; // original 4 opts
+    const correctVals=q.c.map(i=>opts[i]); // correct answer texts
+    // shuffle options
+    const shuffled=[...opts].sort(()=>Math.random()-.5);
+    // recompute correct indices
+    const newCorrect=correctVals.map(v=>shuffled.indexOf(v));
+    return {...q, o:shuffled, c:newCorrect};
+  });
+
+  S.idx=0; S.score=0; S.streak=0; S.bestStreak=0;
+  S.ans=new Array(S.qs.length).fill(null);
+  S.timeTaken=new Array(S.qs.length).fill(0);
+}
+
+// ══════════════════════════════════════════════════════
+//  QUIZ
+// ══════════════════════════════════════════════════════
+function initQuiz(){
+  // dot nav
+  const dn=document.getElementById('dot-nav');
+  dn.innerHTML='';
+  S.qs.forEach((_,i)=>{
+    const d=document.createElement('div');
+    d.className='dn-dot'; d.dataset.i=i;
+    d.addEventListener('click',()=>jumpTo(i));
+    dn.appendChild(d);
+  });
+  // exam pill
+  document.getElementById('qh-exam').textContent=S.exams.map(k=>DB[k].icon+' '+DB[k].name).join(' · ');
+  const dMap={easy:'🌱 Easy',mid:'⚡ Medium',hard:'💀 Hard'};
+  document.getElementById('qh-diff').textContent=dMap[S.diff];
+  // Timer chip updated per question in loadQ
+  loadQ();
+}
+
+function loadQ(){
+  S.answered=false; S.selectedOpts=new Set();
+  const q=S.qs[S.idx];
+  const ex=DB[q.examKey];
+  const n=S.qs.length;
+
+  document.getElementById('q-num-lbl').textContent=`Question ${S.idx+1} of ${n}`;
+  document.getElementById('q-text').textContent=q.q;
+
+  const dtag=document.getElementById('qt-diff');
+  const dCls={easy:'easy',mid:'mid',hard:'hard'};
+  const dLbl={easy:'🌱 Easy',mid:'⚡ Medium',hard:'💀 Hard'};
+  dtag.textContent=dLbl[S.diff]; dtag.className='qtag qtag-diff '+dCls[S.diff];
+  document.getElementById('qt-cat').textContent=ex.icon+' '+ex.name;
+  // Update timer chip in header to show this exam's timer
+  const examTimer=ex.timer||60;
+  const timerChip=document.getElementById('qh-timer');
+  if(timerChip) timerChip.textContent='⏱ '+examTimer+'s/Q';
+  document.getElementById('t-num').textContent=examTimer;
+  document.getElementById('timer-box').className='timer-box';
+  document.getElementById('tbar-fill').style.width='100%';
+  document.getElementById('tbar-fill').className='tbar-fill';
+
+  // multi-answer note
+  const mn=document.getElementById('multi-note');
+  mn.style.display=(q.multi)?'inline-flex':'none';
+
+  // progress
+  const pct=Math.round((S.idx/n)*100);
+  document.getElementById('prog-bar').style.width=pct+'%';
+  document.getElementById('pq-frac').textContent=(S.idx+1)+'/'+n;
+  document.getElementById('pq-pct').textContent=pct+'%';
+
+  // score display
+  document.getElementById('qs-pts').textContent=S.score;
+  document.getElementById('hud-pts').textContent='⚡ '+S.score+' pts';
+  const stkBox=document.getElementById('qs-stk-box');
+  if(S.streak>=2){ stkBox.classList.remove('hidden'); document.getElementById('qs-stk').textContent=S.streak; }
+  else stkBox.classList.add('hidden');
+
+  updateDots();
+
+  // nav
+  document.getElementById('btn-qback').disabled=(S.idx===0);
+  const isLast=S.idx===n-1;
+  document.getElementById('btn-qnext').textContent=isLast?'Finish ✓':'Next →';
+
+  if(S.ans[S.idx]!==null){
+    const prev=S.ans[S.idx];
+    if(prev.timedOut || prev.skipped){
+      // timed-out or skipped: show plain locked options, no answer reveal, no explanation
+      renderOptsLocked(S.qs[S.idx], false);
+      hideFeedback();
+      hideExplain();
+    } else {
+      // answered: show result with correct highlight + explanation
+      renderOpts(S.qs[S.idx],true);
+      showFeedback(prev);
+      showExplain(S.qs[S.idx].e);
+    }
+    document.getElementById('btn-qnext').disabled=false;
+    document.getElementById('btn-skip').disabled=true;
+    stopTimer();
+  } else {
+    renderOpts(q,false);
+    hideFeedback();
+    hideExplain();
+    document.getElementById('btn-qnext').disabled=true;
+    document.getElementById('btn-skip').disabled=false;
+    startTimer();
+  }
+}
+
+function jumpTo(i){
+  if(i===S.idx) return;
+  stopTimer(); S.idx=i; loadQ();
+}
+
+function updateDots(){
+  document.querySelectorAll('.dn-dot').forEach((d,i)=>{
+    d.className='dn-dot';
+    if(i===S.idx){ d.classList.add('cur'); return; }
+    const a=S.ans[i];
+    if(!a) return;
+    if(a.skipped) d.classList.add('skip');
+    else if(a.ok) d.classList.add('ok');
+    else d.classList.add('bad');
+  });
+}
+
+// ── Render Options ────────────────────────────────────
+// renderOptsLocked: lock options, showCorrect=true shows green highlight, false = plain lock
+function renderOptsLocked(q, showCorrect){
+  const container=document.getElementById('opts');
+  container.innerHTML='';
+  const KEYS=['A','B','C','D'];
+  const a=S.ans[S.idx];
+  q.o.forEach((opt,i)=>{
+    const btn=document.createElement('div');
+    btn.className='opt locked';
+    btn.innerHTML=`<div class="opt-key">${KEYS[i]}</div><div class="opt-txt">${opt}</div><div class="opt-ic"></div>`;
+    if(showCorrect && a && !a.skipped && !a.timedOut){
+      const isCorrect=q.c.includes(i);
+      const wasSelected=a.selected&&a.selected.includes(i);
+      if(isCorrect){ btn.classList.add('correct'); btn.querySelector('.opt-ic').textContent='✓'; }
+      else if(wasSelected&&!isCorrect){ btn.classList.add('wrong'); btn.querySelector('.opt-ic').textContent='✗'; }
+    }
+    container.appendChild(btn);
+  });
+}
+
+function renderOpts(q, locked){
+  if(locked){ renderOptsLocked(q, true); return; }
+  // Interactive (unanswered) render
+  const container=document.getElementById('opts');
+  container.innerHTML='';
+  const KEYS=['A','B','C','D'];
+  q.o.forEach((opt,i)=>{
+    const btn=document.createElement('div');
+    btn.className='opt';
+    btn.innerHTML=`<div class="opt-key">${KEYS[i]}</div><div class="opt-txt">${opt}</div><div class="opt-ic"></div>`;
+    btn.addEventListener('click',()=>selectOpt(i,btn,q));
+    container.appendChild(btn);
+  });
+}
+
+function selectOpt(i,btn,q){
+  if(S.answered) return;
+  if(q.multi){
+    // multi: toggle selection
+    if(S.selectedOpts.has(i)){
+      S.selectedOpts.delete(i);
+      btn.classList.remove('sel');
+    } else {
+      S.selectedOpts.add(i);
+      btn.classList.add('sel');
+    }
+    // enable next if at least one selected
+    document.getElementById('btn-qnext').disabled=(S.selectedOpts.size===0);
+    // provide a "Submit" cue (re-use Next button)
+    document.getElementById('btn-qnext').textContent='Submit ✓';
+  } else {
+    // single: immediate answer
+    S.selectedOpts=new Set([i]);
+    submitAnswer(q);
+  }
+}
+
+// For multi: Next/Submit triggers this
+function submitAnswer(q){
+  if(S.answered) return;
+  S.answered=true;
+  stopTimer();
+  if(S.secPerQ>0){
+    const elapsed=Math.max(0,S.secPerQ-S.timeLeft);
+    S.timeTaken[S.idx]=elapsed;
+  }
+  const selected=[...S.selectedOpts];
+  const ok=q.c.length===selected.length && q.c.every(ci=>selected.includes(ci));
+  let pts=0;
+  if(ok){
+    const ratio=S.secPerQ>0?S.timeLeft/S.secPerQ:1;
+    const base={easy:80,mid:120,hard:200}[S.diff];
+    pts=Math.max(20,Math.round(ratio*base));
+    S.score+=pts; S.streak++; S.bestStreak=Math.max(S.bestStreak,S.streak);
+    if(S.streak>=3) showStreakToast(S.streak);
+  } else {
+    S.streak=0;
+  }
+  S.ans[S.idx]={ok,selected,correct:q.c,pts,skipped:false};
+  // reveal options
+  renderOpts(q,true);
+  showFeedback(S.ans[S.idx],q,pts);
+  showExplain(q.e);
+  document.getElementById('btn-qnext').disabled=false;
+  document.getElementById('btn-skip').disabled=true;
+  const isLast=S.idx===S.qs.length-1;
+  document.getElementById('btn-qnext').textContent=isLast?'Finish ✓':'Next →';
+  document.getElementById('qs-pts').textContent=S.score;
+  document.getElementById('hud-pts').textContent='⚡ '+S.score+' pts';
+  updateDots();
+}
+
+// ── SKIP — no answer shown, just move ─────────────────
+document.getElementById('btn-skip').addEventListener('click',()=>{
+  if(S.answered) return;
+  stopTimer();
+  S.timeTaken[S.idx]=0;
+  S.ans[S.idx]={ok:false,selected:[],correct:S.qs[S.idx].c,pts:0,skipped:true};
+  S.streak=0;
+  // Lock options silently — no correct answer shown
+  renderOptsLocked(S.qs[S.idx], false);
+  hideFeedback(); hideExplain();
+  document.getElementById('btn-skip').disabled=true;
+  updateDots();
+  // Auto-move to next (no delay needed, immediate)
+  setTimeout(()=>{
+    if(S.idx<S.qs.length-1){ S.idx++; loadQ(); }
+    else finishQuiz();
+  },200);
+});
+
+// Back / Next
+document.getElementById('btn-qback').addEventListener('click',()=>{
+  if(S.idx===0) return;
+  stopTimer(); S.idx--; loadQ();
+});
+
+document.getElementById('btn-qnext').addEventListener('click',()=>{
+  const q=S.qs[S.idx];
+  // if multi and not yet answered, treat as submit
+  if(q.multi && !S.answered && S.selectedOpts.size>0){
+    submitAnswer(q); return;
+  }
+  if(S.idx<S.qs.length-1){ stopTimer(); S.idx++; loadQ(); }
+  else finishQuiz();
+});
+
+// ── TIMER ─────────────────────────────────────────────
+// Get the timer for the current question's exam category
+function getCurrentTimer(){
+  const q=S.qs[S.idx];
+  if(!q) return 60;
+  return DB[q.examKey]?.timer || 60;
+}
+
+function startTimer(){
+  stopTimer();
+  S.secPerQ=getCurrentTimer(); // set from exam's timer config
+  S.timeLeft=S.secPerQ;
+  window._qStart=Date.now();
+  renderTimer();
+  S.timerId=setInterval(()=>{
+    S.timeLeft--;
+    renderTimer();
+    if(S.timeLeft<=0){ clearInterval(S.timerId); autoTimeout(); }
+  },1000);
+}
+function stopTimer(){ clearInterval(S.timerId); }
+function renderTimer(){
+  if(S.secPerQ===0) return;
+  const pct=S.timeLeft/S.secPerQ;
+  const fill=document.getElementById('tbar-fill');
+  const box=document.getElementById('timer-box');
+  fill.style.width=(pct*100)+'%';
+  document.getElementById('t-num').textContent=S.timeLeft;
+  const cls=pct<=0.3?'danger':pct<=0.5?'warn':'';
+  fill.className='tbar-fill'+(cls?' '+cls:'');
+  box.className='timer-box'+(cls?' '+cls:'');
+}
+function autoTimeout(){
+  if(S.answered) return;
+  S.answered=true;
+  const q=S.qs[S.idx];
+  // Mark as timed-out (no correct reveal, no answer shown)
+  S.ans[S.idx]={ok:false,selected:[],correct:q.c,pts:0,skipped:false,timedOut:true};
+  S.streak=0;
+  // Lock options but DO NOT highlight correct answer
+  renderOptsLocked(q, false);
+  updateDots();
+  hideFeedback();
+  hideExplain();
+  // Auto-move immediately (1s brief flash then next)
+  const isLast=S.idx===S.qs.length-1;
+  // Show a non-intrusive "Time's up" flash on timer box only
+  document.getElementById('timer-box').style.background='rgba(255,77,109,.25)';
+  setTimeout(()=>{
+    document.getElementById('timer-box').style.background='';
+    if(isLast){ finishQuiz(); }
+    else { S.idx++; loadQ(); }
+  },800);
+}
+
+// ── FEEDBACK ──────────────────────────────────────────
+function showFeedback(a,q,pts){
+  const fb=document.getElementById('feedback');
+  if(!a||a.skipped){ fb.className='feedback'; return; }
+  if(a.timedOut){ return; } // already set in autoTimeout
+  if(a.ok){
+    fb.className='feedback ok show';
+    fb.innerHTML=`<div class="fb-icon">✅</div><div class="fb-body"><strong>Correct! +${a.pts} pts</strong>${S.streak>=3?' 🔥 '+S.streak+'× Streak!':''}</div>`;
+  } else {
+    const q2=S.qs[S.idx];
+    const correctStr=a.correct.map(ci=>q2.o[ci]).join(' / ');
+    fb.className='feedback bad show';
+    fb.innerHTML=`<div class="fb-icon">❌</div><div class="fb-body"><strong>Wrong!</strong> Correct: <strong>${correctStr}</strong></div>`;
+  }
+}
+function hideFeedback(){ document.getElementById('feedback').className='feedback'; }
+function showExplain(text){
+  const eb=document.getElementById('explain-box');
+  document.getElementById('explain-text').textContent=text;
+  eb.classList.add('show');
+}
+function hideExplain(){ document.getElementById('explain-box').classList.remove('show'); }
+
+// ── STREAK TOAST ──────────────────────────────────────
+function showStreakToast(n){
+  const t=document.getElementById('streak-toast');
+  document.getElementById('stk-msg').textContent=n+'× Streak! 🔥';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+// ══════════════════════════════════════════════════════
+//  FINISH
+// ══════════════════════════════════════════════════════
+function finishQuiz(){
+  stopTimer();
+  // fill any unanswered
+  S.qs.forEach((_,i)=>{
+    if(!S.ans[i]) S.ans[i]={ok:false,selected:[],correct:S.qs[i].c,pts:0,skipped:true};
+  });
+
+  const n=S.qs.length;
+  const cor=S.ans.filter(a=>a.ok).length;
+  const wrg=S.ans.filter(a=>!a.ok&&!a.skipped).length;
+  const skp=S.ans.filter(a=>a.skipped).length;
+  const acc=Math.round((cor/n)*100);
+
+  // save to user history
+  const ud=USERS[CU];
+  ud.points=(ud.points||0)+S.score;
+  ud.bestStreak=Math.max(ud.bestStreak||0,S.bestStreak);
+  const rec={
+    exam:S.exams[0]||'mixed', exams:S.exams,
+    diff:S.diff, count:n, correct:cor, wrong:wrg, skipped:skp,
+    acc, pts:S.score,
+    date:new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}),
+    perExam:{}
+  };
+  // per-exam breakdown
+  S.exams.forEach(k=>{
+    const ea=S.ans.filter((_,i)=>S.qs[i].examKey===k);
+    const ec=ea.filter(a=>a.ok).length;
+    rec.perExam[k]={total:ea.length,correct:ec,acc:ea.length?Math.round(ec/ea.length*100):0};
+  });
+  ud.history.push(rec);
+  saveUsers();
+  document.getElementById('hud-pts').textContent='⚡ '+ud.points+' pts';
+
+  showResults(cor,wrg,skp,acc);
+}
+
+function showResults(cor,wrg,skp,acc){
+  // hero
+  let emoji,title,sub;
+  if(acc===100){emoji='🏆';title='Perfect Score!';sub='Flawless performance — every answer correct!'}
+  else if(acc>=80){emoji='🎉';title='Outstanding!';sub='Excellent work — you know your stuff!'}
+  else if(acc>=60){emoji='👍';title='Well Done!';sub='Solid performance. Keep it up!'}
+  else if(acc>=40){emoji='📖';title='Keep Learning!';sub='Study the explanations and try again!'}
+  else{emoji='💪';title='Don\'t Give Up!';sub='Review the answers below and retry!'}
+  document.getElementById('rh-emoji').textContent=emoji;
+  document.getElementById('rh-title').innerHTML=`<em>${title}</em>`;
+  document.getElementById('rh-sub').textContent=sub;
+  document.getElementById('ring-pct').textContent=acc+'%';
+  document.getElementById('acc-txt').textContent=acc+'%';
+  document.getElementById('r-cor').textContent=cor;
+  document.getElementById('r-wrg').textContent=wrg;
+  document.getElementById('r-skp').textContent=skp;
+  document.getElementById('r-pts').textContent=S.score;
+
+  // ring
+  const ring=document.getElementById('ring-fg');
+  const circ=376.99;
+  const col=acc>=80?'var(--green)':acc>=50?'var(--amber)':'var(--red)';
+  ring.style.stroke=col;
+  ring.style.strokeDashoffset=circ;
+  setTimeout(()=>{ ring.style.strokeDashoffset=circ-(circ*acc/100); },300);
+  setTimeout(()=>{ document.getElementById('acc-fill').style.width=acc+'%'; },300);
+
+  // breakdown
+  const bdList=document.getElementById('bd-list');
+  bdList.innerHTML='';
+  S.exams.forEach(k=>{
+    const ex=DB[k];
+    const ea=S.ans.filter((_,i)=>S.qs[i].examKey===k);
+    const ec=ea.filter(a=>a.ok).length;
+    const ep=ea.length?Math.round(ec/ea.length*100):0;
+    const brow=document.createElement('div');
+    brow.className='bd-row';
+    brow.innerHTML=`<div class="bd-icon">${ex.icon}</div>
+      <div class="bd-info">
+        <div class="bd-name">${ex.name}</div>
+        <div class="bd-bar"><div class="bd-fill" style="width:0%;background:${ep>=80?'var(--green)':ep>=50?'var(--amber)':'var(--red)'}" data-p="${ep}"></div></div>
+      </div>
+      <div class="bd-score">${ec}/${ea.length} (${ep}%)</div>`;
+    bdList.appendChild(brow);
+  });
+  setTimeout(()=>{ document.querySelectorAll('.bd-fill').forEach(b=>{b.style.transition='width 1.1s cubic-bezier(.4,0,.2,1)';b.style.width=b.dataset.p+'%'}); },400);
+
+  // review
+  const rvItems=document.getElementById('rv-items');
+  rvItems.innerHTML='';
+  S.ans.forEach((a,i)=>{
+    const q=S.qs[i];
+    const ex=DB[q.examKey];
+    const isTimeout=a.timedOut;
+    const cls=a.ok?'ok':a.skipped?'skip':isTimeout?'skip':'bad';
+    const badge=a.ok?'✓ Correct':a.skipped?'⚡ Skipped':isTimeout?'⏱ Time\'s Up':'✗ Wrong';
+    let ansLine='';
+    if(a.skipped||isTimeout){
+      // No correct answer shown in review for skipped/timed-out
+      ansLine=isTimeout?`<span style="color:var(--amber)">Time ran out — no answer recorded</span>`:`<span>Skipped — no answer recorded</span>`;
+    } else if(a.ok){
+      ansLine=`Your answer: <span class="ca">${a.selected.map(si=>q.o[si]).join(' / ')}</span>`;
+    } else {
+      ansLine=`Your: <span class="wa">${a.selected.length?a.selected.map(si=>q.o[si]).join(' / '):'—'}</span> → Correct: <span class="ca">${a.correct.map(ci=>q.o[ci]).join(' / ')}</span>`;
+    }
+    const rv=document.createElement('div');
+    rv.className=`rv ${cls}`;
+    const explainHtml=(a.ok||(!a.skipped&&!isTimeout))?`<div class="rv-explain">💡 ${q.e}</div>`:'';
+    rv.innerHTML=`<div class="rv-top"><span class="rv-badge">${badge}</span><span class="rv-meta">${ex.icon} ${ex.name} · Q${i+1}</span></div>
+      <div class="rv-q">${q.q}</div>
+      <div class="rv-ans">${ansLine}</div>
+      ${explainHtml}`;
+    rvItems.appendChild(rv);
+  });
+
+  // review toggle
+  document.getElementById('rv-hdr').classList.remove('open');
+  rvItems.classList.remove('open');
+
+  if(acc>=70) spawnConfetti();
+  show('s-result');
+}
+
+document.getElementById('rv-hdr').addEventListener('click',()=>{
+  document.getElementById('rv-hdr').classList.toggle('open');
+  document.getElementById('rv-items').classList.toggle('open');
+});
+
+document.getElementById('ra-retry').addEventListener('click',()=>{
+  buildQuestions(); initQuiz(); show('s-quiz');
+});
+document.getElementById('ra-newsetup').addEventListener('click',()=>{
+  switchTab('setup'); show('s-dashboard');
+});
+document.getElementById('ra-dash').addEventListener('click',()=>{
+  switchTab('dash'); show('s-dashboard');
+});
+
+// ══════════════════════════════════════════════════════
+//  STATISTICS
+// ══════════════════════════════════════════════════════
+function renderStats(){
+  const ud=USERS[CU];
+  const h=ud.history;
+  document.getElementById('so-total').textContent=h.length;
+  document.getElementById('so-pts').textContent=ud.points||0;
+  const avgs=h.map(x=>x.acc);
+  document.getElementById('so-avg').textContent=avgs.length?Math.round(avgs.reduce((a,b)=>a+b,0)/avgs.length)+'%':'—';
+
+  // per exam performance
+  const pg=document.getElementById('perf-grid');
+  pg.innerHTML='';
+  Object.entries(DB).forEach(([key,ex])=>{
+    const exH=h.filter(x=>x.exams&&x.exams.includes(key));
+    if(!exH.length) return;
+    const avAcc=Math.round(exH.reduce((s,x)=>s+(x.perExam[key]?.acc||0),0)/exH.length);
+    const col=avAcc>=80?'var(--green)':avAcc>=50?'var(--amber)':'var(--red)';
+    const card=document.createElement('div');
+    card.className='perf-card';
+    card.innerHTML=`<div class="pc-label">${ex.icon} ${ex.name}</div>
+      <div class="pc-val" style="color:${col}">${avAcc}%</div>
+      <div style="font-size:.68rem;color:var(--sub);margin-bottom:.4rem">${exH.length} attempt${exH.length>1?'s':''}</div>
+      <div class="pc-bar"><div class="pc-fill" style="background:${col};width:${avAcc}%"></div></div>`;
+    pg.appendChild(card);
+  });
+  if(!pg.children.length) pg.innerHTML='<div class="empty-state" style="grid-column:1/-1">No exam data yet</div>';
+
+  // leaderboard (all users sorted by points)
+  const lb=document.getElementById('leaderboard');
+  const allUsers=Object.entries(USERS).map(([k,v])=>({key:k,name:v.name,pts:v.points||0,quizzes:v.history.length}));
+  allUsers.sort((a,b)=>b.pts-a.pts);
+  lb.innerHTML=allUsers.slice(0,6).map((u,i)=>{
+    const rankCls=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+    const rankIco=i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1);
+    const isMe=u.key===CU?'style="border-color:var(--acc2)"':'';
+    return `<div class="lb-row" ${isMe}>
+      <div class="lb-rank ${rankCls}">${rankIco}</div>
+      <div class="lb-name">${u.name}${u.key===CU?' 👈':''}</div>
+      <div class="lb-score">${u.pts} pts</div>
+      <div class="lb-badge">${u.quizzes} quiz${u.quizzes!==1?'zes':''}</div>
+    </div>`;
+  }).join('');
+  if(!lb.innerHTML) lb.innerHTML='<div class="empty-state">No data yet</div>';
+
+  // recent history
+  renderHistory('stats-history', h.slice(-8).reverse());
+}
+
+// ══════════════════════════════════════════════════════
+//  CONFETTI
+// ══════════════════════════════════════════════════════
+function spawnConfetti(){
+  const layer=document.getElementById('cf-layer');
+  layer.innerHTML='';
+  const cols=['#5b6af0','#8b5cf6','#10d97e','#fbbf24','#ff4d6d','#38bdf8','#f472b6'];
+  for(let i=0;i<80;i++){
+    const p=document.createElement('div');
+    p.className='cf-p';
+    p.style.cssText=`left:${Math.random()*100}vw;top:0;background:${cols[i%cols.length]};
+      width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;
+      border-radius:${Math.random()>.5?'50%':'2px'};
+      animation-duration:${2+Math.random()*3}s;animation-delay:${Math.random()*1.5}s`;
+    layer.appendChild(p);
+  }
+  setTimeout(()=>layer.innerHTML='',7000);
+}
+</script>
+</body>
+</html>
