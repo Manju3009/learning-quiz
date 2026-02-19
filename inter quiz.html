@@ -149,20 +149,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 
 /* ── SETUP SCREEN ── */
 .setup-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.2rem}
-.diff-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1.5rem}
-.diff-card{background:var(--card2);border:2px solid var(--b1);border-radius:var(--r2);padding:1.4rem .9rem;text-align:center;cursor:pointer;user-select:none;transition:all .2s;position:relative}
-.diff-card .dc-check{position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:50%;display:none;align-items:center;justify-content:center;font-size:.55rem;font-weight:900;color:#000}
-.diff-card.picked .dc-check{display:flex}
-.diff-card.easy:hover,.diff-card.easy.picked{border-color:var(--easy);background:rgba(16,217,126,.08);box-shadow:0 6px 22px rgba(16,217,126,.15)}
-.diff-card.mid:hover,.diff-card.mid.picked{border-color:var(--mid);background:rgba(251,191,36,.08);box-shadow:0 6px 22px rgba(251,191,36,.15)}
-.diff-card.hard:hover,.diff-card.hard.picked{border-color:var(--hard);background:rgba(255,77,109,.08);box-shadow:0 6px 22px rgba(255,77,109,.15)}
-.diff-card.easy .dc-check{background:var(--easy)}
-.diff-card.mid  .dc-check{background:var(--mid)}
-.diff-card.hard .dc-check{background:var(--hard)}
-.dc-icon{font-size:2rem;margin-bottom:.5rem}
-.dc-label{font-weight:800;font-size:.95rem}
-.diff-card.easy .dc-label{color:var(--easy)}.diff-card.mid .dc-label{color:var(--mid)}.diff-card.hard .dc-label{color:var(--hard)}
-.dc-pts{font-size:.65rem;color:var(--sub);margin-top:.3rem}
 .qcount-row{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.5rem}
 .qc-btn{padding:.45rem 1.1rem;border-radius:20px;cursor:pointer;user-select:none;border:1.5px solid var(--b2);background:var(--card2);font-family:var(--font);font-weight:700;font-size:.8rem;color:var(--sub);transition:all .18s}
 .qc-btn:hover{border-color:var(--acc2);color:var(--acc3)}
@@ -273,8 +259,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .quiz-nav{display:flex;gap:.65rem;align-items:center}
 
 /* ── STREAK TOAST ── */
-.streak-toast{position:fixed;top:76px;left:50%;transform:translateX(-50%) translateY(-14px);background:linear-gradient(135deg,var(--amber),#f97316);color:#000;font-weight:800;font-size:.92rem;border-radius:30px;padding:.5rem 1.5rem;box-shadow:0 8px 28px rgba(251,191,36,.4);z-index:999;opacity:0;pointer-events:none;transition:all .3s cubic-bezier(.25,.8,.25,1);white-space:nowrap}
+.streak-toast{position:fixed;top:18px;left:50%;transform:translateX(-50%) translateY(-14px);background:linear-gradient(135deg,var(--amber),#f97316);color:#000;font-weight:800;font-size:.92rem;border-radius:30px;padding:.5rem 1.5rem;box-shadow:0 8px 28px rgba(251,191,36,.4);z-index:1000;opacity:0;pointer-events:none;transition:all .3s cubic-bezier(.25,.8,.25,1);white-space:nowrap}
 .streak-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.level-toast{position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-14px);font-weight:800;font-size:.92rem;border-radius:16px;padding:.7rem 1.8rem;box-shadow:0 8px 28px rgba(0,0,0,.4);z-index:999;opacity:0;pointer-events:none;transition:all .4s cubic-bezier(.25,.8,.25,1);color:#000;text-align:center;line-height:1.4}
+.level-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.level-toast.up{background:linear-gradient(135deg,#10d97e,#38bdf8)}
+.level-toast.down{background:linear-gradient(135deg,#ff4d6d,#f97316)}
 
 /* ── RESULTS ── */
 .result-hero{text-align:center;padding:1.2rem 0 .5rem}
@@ -395,7 +385,6 @@ user-select:none;
 @media(max-width:620px){
   .panel{padding:1.4rem}
   .q-card{padding:1.2rem 1.1rem}
-  .diff-cards{grid-template-columns:1fr}
   .setup-row{grid-template-columns:1fr}
   .stat-grid{grid-template-columns:repeat(2,1fr)}
   .r-actions{grid-template-columns:1fr}
@@ -410,6 +399,7 @@ user-select:none;
 <div class="mesh"><span></span><span></span><span></span></div>
 <div class="cf-layer" id="cf-layer"></div>
 <div class="streak-toast" id="streak-toast">🔥 <span id="stk-msg">3× Streak!</span></div>
+<div class="level-toast" id="level-toast"><span id="lvl-msg">Level Up!</span></div>
 
 <div class="app">
   <nav class="topbar wrap">
@@ -543,42 +533,17 @@ user-select:none;
       <!-- SETUP TAB -->
       <div id="tab-setup" style="display:none">
         <div class="page-title">Configure <em>Your Quiz</em></div>
-        <p class="page-sub">Select exam, difficulty, timer & question count</p>
+        <p class="page-sub">Select exam categories to begin</p>
 
         <div class="section-label">1 — Choose Exam Categories (multi-select)</div>
         <div class="exam-grid" id="exam-grid"></div>
 
-        <div class="section-label">2 — Difficulty Level</div>
-        <div class="diff-cards">
-          <div class="diff-card easy" data-d="easy">
-            <div class="dc-check">✓</div>
-            <div class="dc-icon">🌱</div>
-            <div class="dc-label">Easy</div>
-            <div class="dc-pts">Base 80 pts/Q</div>
-          </div>
-          <div class="diff-card mid" data-d="mid">
-            <div class="dc-check">✓</div>
-            <div class="dc-icon">⚡</div>
-            <div class="dc-label">Medium</div>
-            <div class="dc-pts">Base 120 pts/Q</div>
-          </div>
-          <div class="diff-card hard" data-d="hard">
-            <div class="dc-check">✓</div>
-            <div class="dc-icon">💀</div>
-            <div class="dc-label">Hard</div>
-            <div class="dc-pts">Base 200 pts/Q</div>
-          </div>
-        </div>
 
 
-        <div class="preview-box">
-          <div class="section-label" style="margin-bottom:.5rem">Quiz Preview</div>
-          <div class="prev-row">
-            <span>📚 Exams: <strong id="pv-exams">None</strong></span>
-            <span>🎯 Difficulty: <strong id="pv-diff">—</strong></span>
-            <span>❓ Questions: <strong id="pv-count">Up to 15 per category</strong></span>
-          </div>
-        </div>
+        <!-- hidden stubs for preview JS refs -->
+        <span id="pv-exams" style="display:none"></span>
+        <span id="pv-diff" style="display:none"></span>
+        <span id="pv-count" style="display:none"></span>
         <!-- hidden stubs for JS compatibility -->
         <span id="qcount-display" style="display:none"></span>
         <span id="qcount-avail" style="display:none"></span>
@@ -1048,11 +1013,23 @@ if(!USERS['admin'])    USERS['admin']    = {pass:'admin123',name:'Admin',history
 let CU = null; // current user key
 
 const S = {
-  exams:[],diff:null,qCount:10,secPerQ:20,
+  exams:[],diff:'easy',qCount:15,secPerQ:20,
   qs:[],idx:0,score:0,streak:0,bestStreak:0,
   ans:[],timeTaken:[],timerId:null,timeLeft:0,
-  answered:false,selectedOpts:new Set()
+  answered:false,selectedOpts:new Set(),
+  // Adaptive difficulty — 5 levels mapped to 3 DB pools
+  level:1, // 0=very_easy,1=easy,2=medium,3=hard,4=very_hard
+  recentAns:[],
+  diffHistory:[],
+  pools:{},
+  usedQs:{easy:new Set(),mid:new Set(),hard:new Set()}
 };
+const LEVEL_NAMES=['Very Easy','Easy','Medium','Hard','Very Hard'];
+const LEVEL_ICONS=['🌿','🌱','⚡','🔥','💀'];
+const LEVEL_COLORS=['#10d97e','#38bdf8','#fbbf24','#f97316','#ff4d6d'];
+const LEVEL_POINTS=[60,80,120,160,200];
+// Map 5 levels to 3 DB pools: 0,1→easy  2→mid  3,4→hard
+const LEVEL_TO_POOL=['easy','easy','mid','hard','hard'];
 
 function saveUsers(){ localStorage.setItem('ee_users',JSON.stringify(USERS)); }
 
@@ -1234,18 +1211,8 @@ function toggleExam(key,el){
   if(i===-1){ S.exams.push(key); el.classList.add('selected'); }
   else { S.exams.splice(i,1); el.classList.remove('selected'); }
   updatePreview();
-  document.getElementById('btn-start-quiz').disabled=(!S.exams.length||!S.diff);
+  document.getElementById('btn-start-quiz').disabled=!S.exams.length;
 }
-
-document.querySelectorAll('.diff-card').forEach(c=>{
-  c.addEventListener('click',()=>{
-    document.querySelectorAll('.diff-card').forEach(x=>x.classList.remove('picked'));
-    c.classList.add('picked');
-    S.diff=c.dataset.d;
-    updatePreview();
-    document.getElementById('btn-start-quiz').disabled=(!S.exams.length||!S.diff);
-  });
-});
 
 // Fixed: 10-15 questions per category, timer is per-exam from DB
 S.qCount = 10;
@@ -1253,21 +1220,21 @@ S.secPerQ = 60; // default, overridden per question from DB
 
 function updatePreview(){
   const MAX_PER_CAT=15;
-  const diff=S.diff||'easy';
-  const maxAvail=S.exams.reduce((sum,k)=>sum+Math.min(DB[k][diff].length,MAX_PER_CAT),0);
+  const maxAvail=S.exams.reduce((sum,k)=>{
+    const all=[...DB[k].easy,...DB[k].mid,...DB[k].hard];
+    return sum+Math.min(all.length,MAX_PER_CAT);
+  },0);
   document.getElementById('pv-exams').textContent=S.exams.length
     ? S.exams.map(k=>DB[k].icon+' '+DB[k].name+' ('+DB[k].timer+'s)').join(' · ')
     : 'None';
-  document.getElementById('pv-diff').textContent=S.diff?({easy:'🌱 Easy',mid:'⚡ Medium',hard:'💀 Hard'}[S.diff]):'—';
-  document.getElementById('pv-count').textContent=S.exams.length&&S.diff
+  document.getElementById('pv-count').textContent=S.exams.length
     ? 'Up to 15 per category ('+maxAvail+' available)'
     : 'Up to 15 per category';
 }
 
 document.getElementById('btn-reset-setup').addEventListener('click',()=>{
-  S.exams=[]; S.diff=null;
+  S.exams=[];
   document.querySelectorAll('.exam-card').forEach(c=>c.classList.remove('selected'));
-  document.querySelectorAll('.diff-card').forEach(c=>c.classList.remove('picked'));
   document.getElementById('btn-start-quiz').disabled=true;
   updatePreview();
 });
@@ -1282,31 +1249,143 @@ document.getElementById('btn-start-quiz').addEventListener('click',()=>{
 //  BUILD QUESTIONS — randomise correct position
 // ══════════════════════════════════════════════════════
 function buildQuestions(){
-  const MAX_PER_CAT = 15; // maximum 15 questions per category
-  const pool=[];
+  const POOLS=['easy','mid','hard'];
+  S.pools={easy:[],mid:[],hard:[]};
+  S.usedQs={easy:new Set(),mid:new Set(),hard:new Set()};
   S.exams.forEach(key=>{
-    // shuffle category questions first, then take max MAX_PER_CAT
-    const catQs=[...DB[key][S.diff]].sort(()=>Math.random()-.5);
-    catQs.slice(0, MAX_PER_CAT).forEach(q=>pool.push({...q,examKey:key}));
+    POOLS.forEach(d=>{
+      (DB[key][d]||[]).forEach(q=>{
+        S.pools[d].push({...q, examKey:key});
+      });
+    });
   });
-  // shuffle full pool, then take user-selected count
-  pool.sort(()=>Math.random()-.5);
-  const picked=pool.slice(0,pool.length); // take all available (up to 15 per cat)
+  POOLS.forEach(d=>S.pools[d].sort(()=>Math.random()-.5));
 
-  // For each question, randomise the position of options
-  S.qs=picked.map(q=>{
-    const opts=[...q.o]; // original 4 opts
-    const correctVals=q.c.map(i=>opts[i]); // correct answer texts
-    // shuffle options
-    const shuffled=[...opts].sort(()=>Math.random()-.5);
-    // recompute correct indices
-    const newCorrect=correctVals.map(v=>shuffled.indexOf(v));
-    return {...q, o:shuffled, c:newCorrect};
-  });
+  // Adaptive state reset — start at level 1 (Easy)
+  S.level=1;
+  S.recentAns=[];
+  S.diffHistory=[];
+  S.diff='easy';
+  S.totalQs=15;
+
+  // Pick ONLY the first question — rest picked dynamically after each answer
+  S.qs=[];
+  const first=pickAdaptiveQ();
+  if(first){ S.qs.push(shuffleQ(first)); S.diffHistory.push(S.level); }
 
   S.idx=0; S.score=0; S.streak=0; S.bestStreak=0;
-  S.ans=new Array(S.qs.length).fill(null);
-  S.timeTaken=new Array(S.qs.length).fill(0);
+  S.ans=new Array(S.totalQs).fill(null);
+  S.timeTaken=new Array(S.totalQs).fill(0);
+}
+
+function pickAdaptiveQ(){
+  const pool=LEVEL_TO_POOL[S.level];
+  // Try current pool
+  for(let i=0;i<S.pools[pool].length;i++){
+    if(!S.usedQs[pool].has(i)){
+      S.usedQs[pool].add(i);
+      return {...S.pools[pool][i], _diff:S.level};
+    }
+  }
+  // Fallback: try adjacent pools
+  const adj=[];
+  if(S.level>0) adj.push(LEVEL_TO_POOL[S.level-1]);
+  if(S.level<4) adj.push(LEVEL_TO_POOL[S.level+1]);
+  for(const p of [...new Set(adj)]){
+    for(let i=0;i<S.pools[p].length;i++){
+      if(!S.usedQs[p].has(i)){
+        S.usedQs[p].add(i);
+        return {...S.pools[p][i], _diff:S.level};
+      }
+    }
+  }
+  return null;
+}
+
+// Pick next question at CURRENT difficulty and append to queue
+function pickNextQ(){
+  if(S.qs.length>=S.totalQs) return;
+  const q=pickAdaptiveQ();
+  if(q){
+    S.qs.push(shuffleQ(q));
+    S.diffHistory.push(S.level);
+  }
+}
+
+function checkLevelChange(){
+  const len=S.recentAns.length;
+  if(len<3) return;
+
+  const last5=S.recentAns.slice(-5);
+  const last3=S.recentAns.slice(-3);
+  const correct5=last5.filter(Boolean).length;
+  const wrong3=last3.filter(x=>!x).length;
+
+  // Level UP: 4+ correct out of last 4-5 answers
+  if(len>=4 && correct5>=4 && S.level<4){
+    S.level++;
+    S.recentAns=[];
+    showLevelToast(true);
+    updateDiffBadge();
+    updateQuestionDiffTag();
+  }
+  // Level DOWN: 3 consecutive wrong → drop immediately
+  else if(wrong3===3 && S.level>0){
+    S.level--;
+    S.recentAns=[];
+    showLevelToast(false);
+    updateDiffBadge();
+    updateQuestionDiffTag();
+  }
+}
+
+// Instantly update the difficulty tag on the current question card
+function updateQuestionDiffTag(){
+  const dtag=document.getElementById('qt-diff');
+  if(!dtag) return;
+  dtag.textContent=LEVEL_ICONS[S.level]+' '+LEVEL_NAMES[S.level];
+  dtag.style.cssText='color:'+LEVEL_COLORS[S.level]+';border-color:'+LEVEL_COLORS[S.level];
+  // Animate the tag to draw attention
+  dtag.style.transition='none';
+  dtag.style.transform='scale(1.3)';
+  setTimeout(()=>{
+    dtag.style.transition='transform 0.3s ease';
+    dtag.style.transform='scale(1)';
+  },50);
+}
+
+function shuffleQ(q){
+  const opts=[...q.o];
+  const correctVals=q.c.map(i=>opts[i]);
+  const shuffled=[...opts].sort(()=>Math.random()-.5);
+  const newCorrect=correctVals.map(v=>shuffled.indexOf(v));
+  return {...q, o:shuffled, c:newCorrect};
+}
+
+function showLevelToast(isUp){
+  const t=document.getElementById('level-toast');
+  const label=LEVEL_ICONS[S.level]+' '+LEVEL_NAMES[S.level];
+  const upMsgs=[
+    'You\'re on fire! 🔥','Brilliant mind! 🧠','Unstoppable! 💪',
+    'Keep crushing it! 🚀','Amazing streak! ⭐','You\'re a genius! 🎯',
+    'Next level unlocked! 🏆','Superb performance! 👏','Champion mode! 🥇',
+    'You make it look easy! 😎'
+  ];
+  const downMsgs=[
+    'Stay strong, you got this! 💪','Don\'t give up! 🌟','Keep trying, champ! 🎯',
+    'Every mistake is a lesson! 📚','You\'ll bounce back! 🔄','Focus and conquer! 🧠',
+    'Practice makes perfect! ✨','Believe in yourself! 💫','Take a breath & try again! 🌊',
+    'Winners never quit! 🏅'
+  ];
+  const msgs=isUp?upMsgs:downMsgs;
+  const motivation=msgs[Math.floor(Math.random()*msgs.length)];
+  const color=LEVEL_COLORS[S.level];
+  document.getElementById('lvl-msg').innerHTML=
+    '<span style="font-size:1.1rem">'+(isUp?'⬆️ Level Up':'⬇️ Level Down')+'</span>'+
+    '<br><span style="font-size:1rem;color:'+color+'">→ '+label+'</span>'+
+    '<br><span style="font-size:.78rem;font-weight:600;opacity:.85">'+motivation+'</span>';
+  t.className='level-toast '+(isUp?'up':'down')+' show';
+  setTimeout(()=>t.classList.remove('show'),2800);
 }
 
 // ══════════════════════════════════════════════════════
@@ -1316,16 +1395,15 @@ function initQuiz(){
   // dot nav
   const dn=document.getElementById('dot-nav');
   dn.innerHTML='';
-  S.qs.forEach((_,i)=>{
+  for(let i=0;i<S.totalQs;i++){
     const d=document.createElement('div');
     d.className='dn-dot'; d.dataset.i=i;
     d.addEventListener('click',()=>jumpTo(i));
     dn.appendChild(d);
-  });
+  }
   // exam pill
   document.getElementById('qh-exam').textContent=S.exams.map(k=>DB[k].icon+' '+DB[k].name).join(' · ');
-  const dMap={easy:'🌱 Easy',mid:'⚡ Medium',hard:'💀 Hard'};
-  document.getElementById('qh-diff').textContent=dMap[S.diff];
+  updateDiffBadge();
   // Timer chip updated per question in loadQ
   loadQ();
 }
@@ -1334,15 +1412,17 @@ function loadQ(){
   S.answered=false; S.selectedOpts=new Set();
   const q=S.qs[S.idx];
   const ex=DB[q.examKey];
-  const n=S.qs.length;
+  const n=S.totalQs;
 
   document.getElementById('q-num-lbl').textContent=`Question ${S.idx+1} of ${n}`;
   document.getElementById('q-text').textContent=q.q;
 
   const dtag=document.getElementById('qt-diff');
-  const dCls={easy:'easy',mid:'mid',hard:'hard'};
-  const dLbl={easy:'🌱 Easy',mid:'⚡ Medium',hard:'💀 Hard'};
-  dtag.textContent=dLbl[S.diff]; dtag.className='qtag qtag-diff '+dCls[S.diff];
+  const qlvl=S.qs[S.idx]._diff!=null?S.qs[S.idx]._diff:S.level;
+  dtag.textContent=LEVEL_ICONS[qlvl]+' '+LEVEL_NAMES[qlvl];
+  dtag.style.cssText='color:'+LEVEL_COLORS[qlvl]+';border-color:'+LEVEL_COLORS[qlvl];
+  dtag.className='qtag qtag-diff';
+  updateDiffBadge();
   document.getElementById('qt-cat').textContent=ex.icon+' '+ex.name;
   // Update timer chip in header to show this exam's timer
   const examTimer=ex.timer||60;
@@ -1404,8 +1484,24 @@ function loadQ(){
 }
 
 function jumpTo(i){
-  if(i===S.idx) return;
+  if(i===S.idx || i>=S.qs.length) return;
   stopTimer(); S.idx=i; loadQ();
+}
+
+function updateDiffBadge(){
+  const hd=document.getElementById('qh-diff');
+  if(hd){
+    hd.textContent=LEVEL_ICONS[S.level]+' '+LEVEL_NAMES[S.level];
+    hd.style.color=LEVEL_COLORS[S.level];
+    hd.style.textShadow='0 0 8px '+LEVEL_COLORS[S.level]+'66';
+    // Pulse animation
+    hd.style.transition='none';
+    hd.style.transform='scale(1.25)';
+    setTimeout(()=>{
+      hd.style.transition='transform 0.3s ease';
+      hd.style.transform='scale(1)';
+    },50);
+  }
 }
 
 function updateDots(){
@@ -1492,21 +1588,25 @@ function submitAnswer(q){
   let pts=0;
   if(ok){
     const ratio=S.secPerQ>0?S.timeLeft/S.secPerQ:1;
-    const base={easy:80,mid:120,hard:200}[S.diff];
+    const base=LEVEL_POINTS[q._diff!=null?q._diff:S.level];
     pts=Math.max(20,Math.round(ratio*base));
     S.score+=pts; S.streak++; S.bestStreak=Math.max(S.bestStreak,S.streak);
     if(S.streak>=3) showStreakToast(S.streak);
   } else {
     S.streak=0;
   }
-  S.ans[S.idx]={ok,selected,correct:q.c,pts,skipped:false};
+  S.ans[S.idx]={ok,selected,correct:q.c,pts,skipped:false,diff:q._diff};
+  // Adaptive: track and check
+  S.recentAns.push(ok);
+  if(S.recentAns.length>5) S.recentAns.shift();
+  checkLevelChange();
   // reveal options
   renderOpts(q,true);
   showFeedback(S.ans[S.idx],q,pts);
   showExplain(q.e);
   document.getElementById('btn-qnext').disabled=false;
   document.getElementById('btn-skip').disabled=true;
-  const isLast=S.idx===S.qs.length-1;
+  const isLast=S.idx>=S.totalQs-1;
   document.getElementById('btn-qnext').textContent=isLast?'Finish ✓':'Next →';
   document.getElementById('qs-pts').textContent=S.score;
   document.getElementById('hud-pts').textContent='⚡ '+S.score+' pts';
@@ -1518,16 +1618,19 @@ document.getElementById('btn-skip').addEventListener('click',()=>{
   if(S.answered) return;
   stopTimer();
   S.timeTaken[S.idx]=0;
-  S.ans[S.idx]={ok:false,selected:[],correct:S.qs[S.idx].c,pts:0,skipped:true};
+  S.ans[S.idx]={ok:false,selected:[],correct:S.qs[S.idx].c,pts:0,skipped:true,diff:S.qs[S.idx]._diff};
   S.streak=0;
+  S.recentAns.push(false);
+  if(S.recentAns.length>5) S.recentAns.shift();
+  checkLevelChange();
   // Lock options silently — no correct answer shown
   renderOptsLocked(S.qs[S.idx], false);
   hideFeedback(); hideExplain();
   document.getElementById('btn-skip').disabled=true;
   updateDots();
-  // Auto-move to next (no delay needed, immediate)
+  // Auto-move to next
   setTimeout(()=>{
-    if(S.idx<S.qs.length-1){ S.idx++; loadQ(); }
+    if(S.idx<S.totalQs-1){ pickNextQ(); S.idx++; loadQ(); }
     else finishQuiz();
   },200);
 });
@@ -1544,8 +1647,13 @@ document.getElementById('btn-qnext').addEventListener('click',()=>{
   if(q.multi && !S.answered && S.selectedOpts.size>0){
     submitAnswer(q); return;
   }
-  if(S.idx<S.qs.length-1){ stopTimer(); S.idx++; loadQ(); }
-  else finishQuiz();
+  if(S.idx<S.totalQs-1){
+    stopTimer();
+    // Pick next question at current adaptive level if not yet picked
+    pickNextQ();
+    S.idx++;
+    loadQ();
+  } else finishQuiz();
 });
 
 // ── TIMER ─────────────────────────────────────────────
@@ -1585,15 +1693,18 @@ function autoTimeout(){
   S.answered=true;
   const q=S.qs[S.idx];
   // Mark as timed-out (no correct reveal, no answer shown)
-  S.ans[S.idx]={ok:false,selected:[],correct:q.c,pts:0,skipped:false,timedOut:true};
+  S.ans[S.idx]={ok:false,selected:[],correct:q.c,pts:0,skipped:false,timedOut:true,diff:q._diff};
   S.streak=0;
+  S.recentAns.push(false);
+  if(S.recentAns.length>5) S.recentAns.shift();
+  checkLevelChange();
   // Lock options but DO NOT highlight correct answer
   renderOptsLocked(q, false);
   updateDots();
   hideFeedback();
   hideExplain();
   // Auto-move immediately (1s brief flash then next)
-  const isLast=S.idx===S.qs.length-1;
+  const isLast=S.idx>=S.totalQs-1;
   // Show a non-intrusive "Time's up" flash on timer box only
   document.getElementById('timer-box').style.background='rgba(255,77,109,.25)';
   setTimeout(()=>{
@@ -1629,7 +1740,16 @@ function hideExplain(){ document.getElementById('explain-box').classList.remove(
 // ── STREAK TOAST ──────────────────────────────────────
 function showStreakToast(n){
   const t=document.getElementById('streak-toast');
-  document.getElementById('stk-msg').textContent=n+'× Streak! 🔥';
+  const msgs=[
+    '','',' Keep it up!',
+    ' You\'re on fire!',  // 3
+    ' Incredible!',       // 4
+    ' Unstoppable!',      // 5
+    ' Legendary!',        // 6
+    ' God mode!',         // 7+
+  ];
+  const msg=msgs[Math.min(n,7)]||'';
+  document.getElementById('stk-msg').textContent=n+'× Streak! 🔥'+msg;
   t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2200);
 }
@@ -1645,9 +1765,10 @@ function finishQuiz(){
   });
 
   const n=S.qs.length;
-  const cor=S.ans.filter(a=>a.ok).length;
-  const wrg=S.ans.filter(a=>!a.ok&&!a.skipped).length;
-  const skp=S.ans.filter(a=>a.skipped).length;
+  const answers=S.ans.slice(0,n);
+  const cor=answers.filter(a=>a&&a.ok).length;
+  const wrg=answers.filter(a=>a&&!a.ok&&!a.skipped).length;
+  const skp=answers.filter(a=>!a||a.skipped).length;
   const acc=Math.round((cor/n)*100);
 
   // save to user history
@@ -1677,11 +1798,42 @@ function finishQuiz(){
 function showResults(cor,wrg,skp,acc){
   // hero
   let emoji,title,sub;
-  if(acc===100){emoji='🏆';title='Perfect Score!';sub='Flawless performance — every answer correct!'}
-  else if(acc>=80){emoji='🎉';title='Outstanding!';sub='Excellent work — you know your stuff!'}
-  else if(acc>=60){emoji='👍';title='Well Done!';sub='Solid performance. Keep it up!'}
-  else if(acc>=40){emoji='📖';title='Keep Learning!';sub='Study the explanations and try again!'}
-  else{emoji='💪';title='Don\'t Give Up!';sub='Review the answers below and retry!'}
+  const tips100=[
+    'You are a true champion! Nothing can stop you! 🌟',
+    'Absolute genius! Your preparation is paying off! 🧠',
+    'You crushed it! Ready for the next challenge? 🚀',
+    'Incredible! You\'ve mastered this topic completely! 👑'
+  ];
+  const tips80=[
+    'Your hard work is showing — almost perfect! Keep going! 🔥',
+    'Impressive knowledge! You\'re exam-ready! 💯',
+    'Fantastic result! Just a few more to master! ⭐',
+    'You\'re shining bright! Greatness is within reach! ✨'
+  ];
+  const tips60=[
+    'Good effort! Review the tricky ones and you\'ll ace it next time! 📝',
+    'You\'re on the right track — consistency is key! 🎯',
+    'Solid foundation! A little more practice and you\'ll soar! 🦅',
+    'Nice work! Focus on the mistakes and turn them into strengths! 💪'
+  ];
+  const tips40=[
+    'Don\'t worry — every expert was once a beginner! 🌱',
+    'Progress is progress, no matter how small. Keep pushing! 🏃',
+    'Study the explanations below — they\'re your secret weapon! 🔑',
+    'Believe in yourself! You\'re learning with every attempt! 📚'
+  ];
+  const tipsLow=[
+    'Failure is the stepping stone to success — never give up! 🔥',
+    'The only real failure is not trying again. You\'ve got this! 💪',
+    'Champions are made through practice. Review and come back stronger! 🏆',
+    'Every wrong answer is a lesson learned. Your time will come! 🌈'
+  ];
+  const pick=arr=>arr[Math.floor(Math.random()*arr.length)];
+  if(acc===100){emoji='🏆';title='Perfect Score!';sub=pick(tips100)}
+  else if(acc>=80){emoji='🎉';title='Outstanding!';sub=pick(tips80)}
+  else if(acc>=60){emoji='👍';title='Well Done!';sub=pick(tips60)}
+  else if(acc>=40){emoji='📖';title='Keep Learning!';sub=pick(tips40)}
+  else{emoji='💪';title='Don\'t Give Up!';sub=pick(tipsLow)}
   document.getElementById('rh-emoji').textContent=emoji;
   document.getElementById('rh-title').innerHTML=`<em>${title}</em>`;
   document.getElementById('rh-sub').textContent=sub;
