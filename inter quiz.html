@@ -427,26 +427,28 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .result-quote q{font-style:italic;color:var(--text);font-size:.92rem;font-weight:500;line-height:1.6;display:block}
 .result-quote .rq-author{color:var(--muted);font-size:.75rem;margin-top:.4rem;display:block}
 .r-actions{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:1.5rem}
-.r-actions .ra-full{grid-column:1/-1}
+.r-actions-3{grid-template-columns:1fr 1fr 1fr}
 .ra-btn{
 display:flex;
 align-items:center;
 justify-content:center;
 gap:.4rem;
-padding:.85rem;
+padding:1rem;
 border-radius:var(--r2);
 font-family:var(--font);
 font-weight:800;
-font-size:.88rem;
+font-size:.92rem;
 cursor:pointer;
 border:none;
 transition:all .2s;
 user-select:none;
 }
-.ra-primary{background:var(--grad);color:#fff;box-shadow:0 4px 18px rgba(91,106,240,.35)}
-.ra-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(91,106,240,.5)}
-.ra-ghost{background:var(--card2);border:1.5px solid var(--b2);color:var(--text)}
-.ra-ghost:hover{border-color:var(--acc2);color:var(--acc3)}
+.ra-primary{background:linear-gradient(135deg,#10d97e,#0eb86e);color:#fff;box-shadow:0 4px 18px rgba(16,217,126,.35)}
+.ra-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(16,217,126,.5)}
+.ra-retry-btn{background:var(--card2);border:1.5px solid var(--amber);color:var(--amber)}
+.ra-retry-btn:hover{background:rgba(251,191,36,.1);transform:translateY(-1px)}
+.ra-exit{background:var(--card2);border:1.5px solid var(--red);color:var(--red)}
+.ra-exit:hover{background:rgba(255,77,109,.1);transform:translateY(-1px)}
 
 /* ── STATS SCREEN ── */
 .stats-hero{text-align:center;margin-bottom:1.5rem}
@@ -485,8 +487,7 @@ user-select:none;
   .q-card{padding:1.2rem 1.1rem}
   .setup-row{grid-template-columns:1fr}
   .stat-grid{grid-template-columns:repeat(2,1fr)}
-  .r-actions{grid-template-columns:1fr}
-  .r-actions .ra-full{grid-column:unset}
+  .r-actions,.r-actions-3{grid-template-columns:1fr}
   .dash-grid{grid-template-columns:1fr}
   .stats-overview{grid-template-columns:1fr 1fr}
   .perf-grid{grid-template-columns:1fr}
@@ -820,6 +821,10 @@ user-select:none;
             </div>
           </div>
         </div>
+        <div class="result-quote" id="result-quote">
+          <q id="rq-text"></q>
+          <span class="rq-author" id="rq-author"></span>
+        </div>
         <div class="acc-bar-wrap">
           <div class="acc-labels"><span>Overall Accuracy</span><strong id="acc-txt">0%</strong></div>
           <div class="acc-track"><div class="acc-fill" id="acc-fill" style="width:0"></div></div>
@@ -838,14 +843,10 @@ user-select:none;
         <div class="bd-list" id="bd-list"></div>
         <div class="review-hdr" id="rv-hdr"><span class="rh-ttl">📝 Answer Review</span><span class="rh-ico">▼</span></div>
         <div class="review-items" id="rv-items"></div>
-        <div class="result-quote" id="result-quote">
-          <q id="rq-text"></q>
-          <span class="rq-author" id="rq-author"></span>
-        </div>
-        <div class="r-actions">
-          <button class="ra-btn ra-ghost" id="ra-retry">🔁 Retry</button>
-          <button class="ra-btn ra-ghost" id="ra-newsetup">⚙️ New Setup</button>
-          <button class="ra-btn ra-primary ra-full" id="ra-dash">🏠 Back to Dashboard</button>
+        <div class="r-actions r-actions-3">
+          <button class="ra-btn ra-primary" id="ra-retry">➡️ Continue Next</button>
+          <button class="ra-btn ra-retry-btn" id="ra-retryexam">🔁 Retry</button>
+          <button class="ra-btn ra-exit" id="ra-dash">🚪 Leave</button>
         </div>
       </div>
     </div>
@@ -1183,11 +1184,12 @@ function buildQuestions(){
   });
   POOLS.forEach(d=>S.pools[d].sort(()=>Math.random()-.5));
 
-  // Adaptive state reset — start at level 1 (Easy)
-  S.level=1;
+  // Adaptive state — start at given level or default Easy (1)
+  S.level=(typeof S._continueLevel==='number')?S._continueLevel:1;
+  S._continueLevel=null;
   S.recentAns=[];
   S.diffHistory=[];
-  S.diff='easy';
+  S.diff=LEVEL_TO_POOL[S.level]||'easy';
   S.totalQs=15;
 
   // Pick ONLY the first question — rest picked dynamically after each answer
@@ -2176,11 +2178,22 @@ document.getElementById('rv-hdr').addEventListener('click',()=>{
   document.getElementById('rv-items').classList.toggle('open');
 });
 
+// Continue Next — new questions, same exam, keep difficulty level
 document.getElementById('ra-retry').addEventListener('click',()=>{
+  S._continueLevel=S.level;
   buildQuestions(); initQuiz(); show('s-quiz');
 });
-document.getElementById('ra-newsetup').addEventListener('click',()=>{
-  switchTab('setup'); show('s-dashboard');
+// Retry — replay the exact same questions
+document.getElementById('ra-retryexam').addEventListener('click',()=>{
+  // Reset answers but keep same questions
+  S.ans=new Array(S.totalQs).fill(null);
+  S.score=0; S.streak=0; S.bestStreak=0;
+  S.timeTaken=new Array(S.totalQs).fill(0);
+  S.recentAns=[]; S.level=1;
+  S.diffHistory=S.diffHistory.map(()=>S.level);
+  S.idx=0;
+  initQuiz();
+  show('s-quiz');
 });
 document.getElementById('ra-dash').addEventListener('click',()=>{
   switchTab('dash'); show('s-dashboard');
