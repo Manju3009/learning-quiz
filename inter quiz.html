@@ -75,6 +75,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .btn-outline:hover{border-color:var(--acc2);color:var(--acc3)}
 .btn-ghost{background:transparent;color:var(--muted);border:1.5px dashed var(--b2);padding:.75rem 1.2rem;font-size:.82rem}
 .btn-ghost:hover{border-color:var(--amber);color:var(--amber)}
+.btn-check{background:linear-gradient(135deg,#10d97e,#0eb86e);color:#fff;padding:.8rem 1.4rem;font-size:.88rem;font-weight:700;box-shadow:0 4px 16px rgba(16,217,126,.3)}
+.btn-check:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(16,217,126,.45)}
+.btn-check:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-exit{background:transparent;color:var(--red);border:1.5px solid var(--red);padding:.75rem 1.2rem;font-size:.82rem}
+.btn-exit:hover{background:rgba(255,77,109,.1);transform:translateY(-1px)}
 .btn-danger{background:rgba(255,77,109,.12);color:var(--red);border:1.5px solid rgba(255,77,109,.3);padding:.8rem 1.4rem;font-size:.88rem}
 .btn-danger:hover{background:rgba(255,77,109,.22);border-color:var(--red)}
 .btn-full{width:100%}
@@ -202,13 +207,54 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .prog-meta .frac{color:var(--text);font-weight:800}
 .prog-track{height:5px;background:var(--card2);border-radius:5px;overflow:hidden}
 .prog-bar{height:100%;border-radius:5px;background:var(--grad);transition:width .5s cubic-bezier(.4,0,.2,1)}
-.qnav-sidebar{display:none;grid-template-columns:repeat(15,1fr);gap:4px;background:var(--card);border:1px solid var(--b1);border-radius:10px;padding:6px 8px;margin-bottom:.8rem;justify-items:center}
-.dn-dot{width:100%;max-width:36px;height:30px;border-radius:6px;background:var(--card2);border:1.5px solid var(--b2);cursor:pointer;transition:all .22s;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--sub)}
-.dn-dot:hover{border-color:var(--acc2);background:rgba(91,106,240,.1);transform:scale(1.08)}
-.dn-dot.cur{background:var(--acc);border-color:var(--acc);color:#fff;box-shadow:0 0 10px rgba(91,106,240,.5);transform:scale(1.08)}
-.dn-dot.ok{background:rgba(16,217,126,.15);border-color:var(--green);color:var(--green)}
-.dn-dot.bad{background:rgba(255,77,109,.15);border-color:var(--red);color:var(--red)}
-.dn-dot.skip{background:rgba(148,163,184,.1);border-color:var(--muted);color:var(--muted)}
+/* ── QUIZ LAYOUT (sidebar + main) ── */
+.quiz-layout{display:flex;gap:1.2rem;align-items:flex-start}
+.quiz-sidebar{width:280px;min-width:280px;display:none;flex-direction:column;gap:.8rem;position:sticky;top:80px}
+.quiz-main{flex:1;min-width:0}
+
+/* sidebar panel */
+.sb-panel{background:var(--card);border:1px solid var(--b1);border-radius:var(--r2);padding:1rem 1.1rem}
+.sb-title{font-size:.65rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.7rem}
+
+/* sidebar stats */
+.sb-stats{display:flex;flex-direction:column;gap:.55rem}
+.sb-stat-row{display:flex;align-items:center;justify-content:space-between}
+.sb-stat-label{display:flex;align-items:center;gap:.4rem;font-size:.78rem;color:var(--sub);font-weight:600}
+.sb-stat-label .sb-ico{font-size:.85rem}
+.sb-stat-val{font-weight:800;font-size:.9rem;color:var(--text)}
+.sb-stat-val.acc-green{color:var(--green)}
+.sb-stat-val.acc-amber{color:var(--amber)}
+.sb-stat-val.acc-red{color:var(--red)}
+
+/* sidebar progress bar */
+.sb-prog{margin-top:.4rem}
+.sb-prog-info{display:flex;justify-content:space-between;font-size:.68rem;color:var(--sub);font-weight:600;margin-bottom:.35rem}
+.sb-prog-info span:first-child{color:var(--text)}
+.sb-prog-track{height:6px;background:var(--card2);border-radius:6px;overflow:hidden}
+.sb-prog-bar{height:100%;border-radius:6px;background:var(--grad);transition:width .5s cubic-bezier(.4,0,.2,1)}
+
+/* sidebar question sets */
+.sb-qset{margin-bottom:.6rem}
+.sb-qset-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem}
+.sb-qset-label{font-size:.72rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:.35rem}
+.sb-qset-label .sb-diff-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.sb-qset-count{font-size:.62rem;color:var(--sub);font-weight:600}
+.sb-qset-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.sb-qbox{width:100%;aspect-ratio:1;border-radius:6px;background:var(--card2);border:1.5px solid var(--b2);cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;color:var(--sub)}
+.sb-qbox:hover{border-color:var(--acc2);transform:scale(1.08)}
+.sb-qbox.cur{background:var(--acc);border-color:var(--acc);color:#fff;box-shadow:0 0 8px rgba(91,106,240,.5)}
+.sb-qbox.ok{background:rgba(16,217,126,.15);border-color:var(--green);color:var(--green)}
+.sb-qbox.bad{background:rgba(255,77,109,.15);border-color:var(--red);color:var(--red)}
+.sb-qbox.skip{background:rgba(148,163,184,.1);border-color:var(--muted);color:var(--muted)}
+
+/* sidebar difficulty journey */
+.sb-journey{display:flex;flex-direction:column;gap:.4rem;max-height:180px;overflow-y:auto}
+.sb-journey::-webkit-scrollbar{width:3px}
+.sb-journey::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px}
+.sb-jrow{display:flex;align-items:center;gap:.5rem;font-size:.72rem;padding:.3rem .45rem;border-radius:6px;background:var(--card2);border:1px solid var(--b2)}
+.sb-jrow-num{font-weight:800;color:var(--muted);min-width:16px}
+.sb-jrow-diff{font-weight:700;display:flex;align-items:center;gap:.25rem}
+.sb-jrow-score{margin-left:auto;font-size:.62rem;color:var(--sub);font-weight:600}
 
 /* question card */
 .q-card{background:var(--card2);border:1px solid var(--b2);border-radius:var(--r2);padding:1.6rem 1.8rem;margin-bottom:.9rem}
@@ -392,8 +438,10 @@ user-select:none;
   .dash-grid{grid-template-columns:1fr}
   .stats-overview{grid-template-columns:1fr 1fr}
   .perf-grid{grid-template-columns:1fr}
-  .qnav-sidebar{grid-template-columns:repeat(15,1fr);padding:4px;gap:2px}
-  .dn-dot{height:24px;font-size:.55rem;border-radius:4px}
+  .quiz-layout{flex-direction:column}
+  .quiz-sidebar{width:100%;min-width:unset;position:static;flex-direction:column}
+  .sb-qset-grid{grid-template-columns:repeat(5,1fr)}
+  .sb-qbox{font-size:.6rem}
 }
 </style>
 </head>
@@ -438,7 +486,7 @@ user-select:none;
           <!-- SIGN IN -->
           <div class="form-section active" id="form-login">
             <div class="field">
-              <label>Username or Email</label>
+              <label>Username</label>
               <div class="input-wrap">
                 <input type="text" id="li-user" placeholder="Enter username" autocomplete="username"/>
               </div>
@@ -461,11 +509,6 @@ user-select:none;
               <label>Full Name</label>
               <input type="text" id="rg-name" placeholder="Your full name"/>
               <div class="field-error" id="rg-name-err">Name must be at least 2 characters</div>
-            </div>
-            <div class="field">
-              <label>Email Address</label>
-              <input type="email" id="rg-email" placeholder="your@email.com" autocomplete="email"/>
-              <div class="field-error" id="rg-email-err">Enter a valid email address</div>
             </div>
             <div class="field">
               <label>Username</label>
@@ -567,7 +610,7 @@ user-select:none;
         </div>
         <div class="section-label">Performance by Exam</div>
         <div id="perf-grid" class="perf-grid"></div>
-        <div class="section-label">All-Time Leaderboard</div>
+        <div class="section-label">Your Stats</div>
         <div class="leaderboard" id="leaderboard"></div>
         <div class="section-label">Recent History (All Attempts)</div>
         <div class="history-list" id="stats-history"></div>
@@ -598,30 +641,79 @@ user-select:none;
           </div>
         </div>
       </div>
-      <div class="prog-wrap">
-        <div class="prog-meta"><span class="frac" id="pq-frac">1/10</span><span id="pq-pct">0%</span></div>
-        <div class="prog-track"><div class="prog-bar" id="prog-bar"></div></div>
-      </div>
-      <div class="qnav-sidebar" id="dot-nav"></div>
-      <div class="q-card">
-        <div class="q-tags">
-          <span class="qtag qtag-diff" id="qt-diff">🌱 Easy</span>
-          <span class="qtag qtag-cat" id="qt-cat">📚</span>
+
+      <div class="quiz-layout">
+        <!-- ── SIDEBAR ── -->
+        <div class="quiz-sidebar" id="quiz-sidebar">
+          <!-- Stats -->
+          <div class="sb-panel">
+            <div class="sb-stats">
+              <div class="sb-stat-row">
+                <div class="sb-stat-label"><span class="sb-ico">⚡</span> Points</div>
+                <div class="sb-stat-val" id="sb-pts">0</div>
+              </div>
+              <div class="sb-stat-row">
+                <div class="sb-stat-label"><span class="sb-ico">🎯</span> Accuracy</div>
+                <div class="sb-stat-val" id="sb-acc">0%</div>
+              </div>
+              <div class="sb-stat-row">
+                <div class="sb-stat-label"><span class="sb-ico">🔥</span> Streak</div>
+                <div class="sb-stat-val" id="sb-streak">0</div>
+              </div>
+              <div class="sb-stat-row">
+                <div class="sb-stat-label"><span class="sb-ico">⏱</span> Avg Time</div>
+                <div class="sb-stat-val" id="sb-avgtime">0s</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Overall Progress -->
+          <div class="sb-panel">
+            <div class="sb-title">Overall Progress</div>
+            <div class="sb-prog">
+              <div class="sb-prog-info"><span id="sb-prog-ans">0 answered</span><span id="sb-prog-pct">0%</span></div>
+              <div class="sb-prog-track"><div class="sb-prog-bar" id="sb-prog-bar"></div></div>
+            </div>
+          </div>
+
+          <!-- Question Sets -->
+          <div class="sb-panel">
+            <div class="sb-title">Question Sets</div>
+            <div id="sb-qsets"></div>
+          </div>
+
+          <!-- Difficulty Journey -->
+          <div class="sb-panel">
+            <div class="sb-title">Difficulty Journey</div>
+            <div class="sb-journey" id="sb-journey"></div>
+          </div>
         </div>
-        <div class="q-num" id="q-num-lbl">Question 1 of 10</div>
-        <div class="q-text" id="q-text">Loading…</div>
-        <div class="multi-note" id="multi-note" style="display:none">⚠️ Multiple correct answers — select all that apply</div>
-      </div>
-      <div class="opts" id="opts"></div>
-      <div class="feedback" id="feedback"></div>
-      <div class="explain-box" id="explain-box">
-        <div class="ex-title">💡 Explanation</div>
-        <div id="explain-text"></div>
-      </div>
-      <div class="quiz-nav">
-        <button class="btn btn-outline" id="btn-qback" disabled>← Back</button>
-        <button class="btn btn-ghost" id="btn-skip">Skip</button>
-        <button class="btn btn-primary" id="btn-qnext" disabled>Next →</button>
+
+        <!-- ── MAIN QUIZ ── -->
+        <div class="quiz-main">
+          <div class="q-card">
+            <div class="q-tags">
+              <span class="qtag qtag-diff" id="qt-diff">🌱 Easy</span>
+              <span class="qtag qtag-cat" id="qt-cat">📚</span>
+            </div>
+            <div class="q-num" id="q-num-lbl">Question 1 of 10</div>
+            <div class="q-text" id="q-text">Loading…</div>
+            <div class="multi-note" id="multi-note" style="display:none">⚠️ Multiple correct answers — select all that apply</div>
+          </div>
+          <div class="opts" id="opts"></div>
+          <div class="feedback" id="feedback"></div>
+          <div class="explain-box" id="explain-box">
+            <div class="ex-title">💡 Explanation</div>
+            <div id="explain-text"></div>
+          </div>
+          <div class="quiz-nav">
+            <button class="btn btn-outline" id="btn-qback" disabled>← Back</button>
+            <button class="btn btn-ghost" id="btn-skip">Skip</button>
+            <button class="btn btn-check" id="btn-check" disabled>Check ✓</button>
+            <button class="btn btn-primary" id="btn-qnext" disabled>Next →</button>
+            <button class="btn btn-exit" id="btn-exit">Exit</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -672,336 +764,11 @@ user-select:none;
     </div>
   </div>
 </div>
+<script src="db.js"></script>
 <script>
 'use strict';
-// ══════════════════════════════════════════════════════
-//  QUESTION DATABASE  (8 exams × 3 difficulties × 6–8 Qs)
-//  Each Q has: q, options[4], correct (array of indices),
-//              explanation, multi (bool)
-// ══════════════════════════════════════════════════════
-const DB = {
-  tnpsc:{
-    name:'TNPSC', icon:'🏛️', badge:'eb-tnpsc', label:'TNPSC',
-    desc:'TN History, Geography, Culture', timer:60,
-    easy:[
-      {q:'Who is known as the "Iron Man of India"?',o:['Jawaharlal Nehru','Sardar Vallabhbhai Patel','Subhas Chandra Bose','B.R. Ambedkar'],c:[1],e:'Sardar Vallabhbhai Patel unified princely states after Independence and is called the Iron Man of India.'},
-      {q:'Tamil Nadu was formed on which date?',o:['1 November 1956','26 January 1950','15 August 1947','14 April 1960'],c:[0],e:'Tamil Nadu was formed on 1 November 1956 during the States Reorganisation Act based on linguistic lines.'},
-      {q:'Which river is called the "Lifeline of Tamil Nadu"?',o:['Krishna','Cauvery','Godavari','Palar'],c:[1],e:'The Cauvery river is called the lifeline of Tamil Nadu as it irrigates the fertile delta region.'},
-      {q:'The capital of Tamil Nadu is:',o:['Coimbatore','Madurai','Chennai','Trichy'],c:[2],e:'Chennai (formerly Madras) is the capital and largest city of Tamil Nadu.'},
-      {q:'Which classical language belongs to Tamil Nadu?',o:['Sanskrit','Hindi','Tamil','Kannada'],c:[2],e:'Tamil is one of the oldest classical languages in the world and the official language of Tamil Nadu.'},
-      {q:'Who was the first Chief Minister of Tamil Nadu?',o:['M.G. Ramachandran','C.N. Annadurai','Kamaraj','Jayalalithaa'],c:[2],e:'K. Kamaraj was the Chief Minister of Tamil Nadu from 1954 to 1963.'},
-      {q:'The Nilgiri Hills are part of which mountain range?',o:['Himalayas','Eastern Ghats','Western Ghats','Vindhyas'],c:[2],e:'The Nilgiri Hills are part of the Western Ghats, located at the junction of Tamil Nadu, Kerala and Karnataka.'},
-      {q:'Marina Beach is located in which city of Tamil Nadu?',o:['Madurai','Coimbatore','Chennai','Trichy'],c:[2],e:'Marina Beach in Chennai is the longest natural urban beach in India (~13 km) and the world\'s second longest.'},
-      {q:'Pongal is a harvest festival of which state?',o:['Andhra Pradesh','Karnataka','Tamil Nadu','Kerala'],c:[2],e:'Pongal is the major harvest festival of Tamil Nadu, celebrated in January to thank the Sun god.'},
-      {q:'Which of the following is the state animal of Tamil Nadu?',o:['Tiger','Elephant','Nilgiri Tahr','Lion'],c:[2],e:'The Nilgiri Tahr is the state animal of Tamil Nadu, an endangered mountain ungulate found in the Nilgiris.'},
-    ],
-    mid:[
-      {q:'The Nilgiris Biosphere Reserve is located primarily in:',o:['Kerala','Karnataka','Tamil Nadu','Andhra Pradesh'],c:[2],e:'Nilgiris Biosphere Reserve mainly falls in Tamil Nadu, covering the Nilgiri hills area.'},
-      {q:'Article 370 was related to:',o:['Language rights','Special status of J&K','Scheduled tribes','Reservation policy'],c:[1],e:'Article 370 granted special autonomous status to Jammu & Kashmir, abrogated in August 2019.'},
-      {q:'Which TNPSC Group exam recruits for District Collector-level posts?',o:['Group I','Group II','Group IV','Group VIII'],c:[0],e:'TNPSC Group I services include IAS-level state posts like Deputy Collector, DSP, etc.'},
-      {q:'The Panchayati Raj system is governed under which article?',o:['Article 40','Article 73','Article 243','Article 356'],c:[2],e:'Articles 243 to 243O (73rd Amendment, 1992) deal with Panchayati Raj institutions.'},
-      {q:'Bharathiar University is located in which city?',o:['Chennai','Madurai','Coimbatore','Salem'],c:[2],e:'Bharathiar University is located in Coimbatore, Tamil Nadu, named after the poet Subramania Bharathiar.'},
-      {q:'The ancient port city of Tamil Nadu is:',o:['Madurai','Poompuhar','Kanchipuram','Thanjavur'],c:[1],e:'Poompuhar (ancient Kaveri-poompattinam) was a major Chola port city on the Cauvery delta.'},
-      {q:'Thirukkural was written by:',o:['Kambar','Thiruvalluvar','Avvaiyar','Ilango Adigal'],c:[1],e:'Thirukkural, a classic Tamil text on ethics and virtue, was authored by the poet-philosopher Thiruvalluvar.'},
-      {q:'The highest peak in Tamil Nadu is:',o:['Doddabetta','Anamudi','Kodaikanal Peak','Agasthyamalai'],c:[0],e:'Doddabetta (2,637 m) in the Nilgiris is the highest peak in Tamil Nadu and the Nilgiri Hills.'},
-      {q:'Which dynasty built the Brihadeeswarar Temple in Thanjavur?',o:['Pallava','Pandya','Chola','Chera'],c:[2],e:'The Brihadeeswarar Temple was built by Chola King Raja Raja Chola I in 1010 CE.'},
-      {q:'The Five Year Plan focused on "Growth with Social Justice":',o:['5th','8th','10th','11th'],c:[3],e:'The 11th Five Year Plan (2007–2012) had the theme "Faster and More Inclusive Growth / Growth with Social Justice."'},
-    ],
-    hard:[
-      {q:'Under which Schedule are Panchayat powers listed?',o:['Ninth Schedule','Tenth Schedule','Eleventh Schedule','Twelfth Schedule'],c:[2],e:'The Eleventh Schedule (added by 73rd Amendment) lists 29 subjects under Panchayat jurisdiction.'},
-      {q:'Which Article of the Constitution abolishes untouchability?',o:['Article 14','Article 15','Article 17','Article 21'],c:[2],e:'Article 17 abolishes untouchability and forbids its practice in any form.'},
-      {q:'The Doctrine of Lapse was introduced by:',o:['Lord Dalhousie','Lord Cornwallis','Lord Wellesley','Lord Canning'],c:[0],e:'Governor-General Lord Dalhousie introduced the Doctrine of Lapse (1848), annexing states without a male heir.'},
-      {q:'Megasthenes was ambassador to which Mauryan king?',o:['Ashoka','Bindusara','Chandragupta Maurya','Bimbisara'],c:[2],e:'Megasthenes served as ambassador of Seleucus I Nicator to the Mauryan court of Chandragupta Maurya.'},
-      {q:'The Rowlatt Act (1919) allowed the British to:',o:['Grant voting rights','Detain without trial','Allow free press','Give trade union rights'],c:[1],e:'The Rowlatt Act empowered the British to detain any person without trial, triggering the Non-Cooperation Movement.'},
-      {q:'Which is NOT a Fundamental Duty under Article 51A?',o:['Protect environment','Pay taxes','Safeguard public property','Develop scientific temper'],c:[1],e:'Paying taxes is not listed among the 11 Fundamental Duties under Article 51A of the Indian Constitution.'},
-      {q:'The Pallava dynasty capital was:',o:['Madurai','Kanchipuram','Thanjavur','Uraiyur'],c:[1],e:'Kanchipuram was the capital of the Pallava dynasty, famous for its temples and silk weaving.'},
-      {q:'Sangam literature belongs to which period?',o:['100 CE – 500 CE','300 BCE – 300 CE','500 BCE – 100 BCE','600 CE – 900 CE'],c:[1],e:'Sangam literature refers to the corpus of ancient Tamil poetry compiled roughly between 300 BCE and 300 CE.'},
-      {q:'The Vaigai River originates from:',o:['Nilgiris','Kodaikanal hills','Palani hills','Anaimalai hills'],c:[2],e:'The Vaigai River originates from the Varushanad hills near Palani, flowing through Madurai.'},
-      {q:'Which town is famous for Tanjore paintings?',o:['Madurai','Thanjavur','Kumbakonam','Trichy'],c:[1],e:'Thanjavur (Tanjore) paintings are a major form of classical South Indian painting from the Thanjavur region of Tamil Nadu.'},
-    ]
-  },
-  ssc:{
-    name:'SSC', icon:'📋', badge:'eb-ssc', label:'SSC CGL/CHSL',
-    desc:'Polity, English, Quant, GK', timer:45,
-    easy:[
-      {q:'Which is the smallest prime number?',o:['0','1','2','3'],c:[2],e:'2 is the smallest and the only even prime number.'},
-      {q:'"Discovery of India" was written by:',o:['M.K. Gandhi','Jawaharlal Nehru','Rabindranath Tagore','B.R. Ambedkar'],c:[1],e:'"Discovery of India" was written by Jawaharlal Nehru while imprisoned at Ahmednagar Fort (1944).'},
-      {q:'The synonym of "Eloquent" is:',o:['Fluent','Silent','Confused','Rough'],c:[0],e:'Eloquent means fluent or persuasive in speaking or writing.'},
-      {q:'Speed of sound in air at 0°C is approximately:',o:['232 m/s','331 m/s','440 m/s','550 m/s'],c:[1],e:'Speed of sound in dry air at 0°C is approximately 331 m/s, increasing with temperature.'},
-      {q:'A train 200m long passes a pole in 10 seconds. Its speed is:',o:['10 m/s','15 m/s','20 m/s','25 m/s'],c:[2],e:'Speed = Distance/Time = 200/10 = 20 m/s.'},
-      {q:'The President of India is elected by:',o:['Lok Sabha only','Rajya Sabha only','Both Houses of Parliament','Electoral College'],c:[3],e:'The President is elected by an Electoral College consisting of elected members of both Houses of Parliament and State Legislative Assemblies.'},
-      {q:'Which article of the Constitution deals with Right to Equality?',o:['Article 12','Article 14','Article 19','Article 21'],c:[1],e:'Article 14 guarantees equality before law and equal protection of laws to all persons in India.'},
-      {q:'The LCM of 4 and 6 is:',o:['12','24','6','8'],c:[0],e:'LCM(4,6) = 12. 4=2², 6=2×3. LCM = 2²×3 = 12.'},
-      {q:'The antonym of "Obdurate" is:',o:['Stubborn','Yielding','Harsh','Indifferent'],c:[1],e:'Obdurate means stubbornly refusing to change; its antonym is yielding or flexible.'},
-      {q:'2³ × 2² = ?',o:['2⁵','2⁶','4⁵','2¹'],c:[0],e:'When multiplying same base, add exponents: 2³ × 2² = 2^(3+2) = 2⁵ = 32.'},
-    ],
-    mid:[
-      {q:'If 3x + 5 = 20, find x.',o:['3','5','4','6'],c:[1],e:'3x = 20-5 = 15, so x = 5.'},
-      {q:'Average of 5 numbers is 20. If one removed, average becomes 18. The removed number:',o:['24','28','20','32'],c:[1],e:'Sum of 5 = 100. Sum of 4 = 72. Removed = 100-72 = 28.'},
-      {q:'Select the correctly spelt word:',o:['Accomodate','Accommodate','Acomodate','Accomdate'],c:[1],e:'"Accommodate" has double c and double m — a common misspelling.'},
-      {q:'A can do a work in 10 days, B in 15 days. Together in:',o:['5 days','6 days','7 days','8 days'],c:[1],e:'Combined rate = 1/10 + 1/15 = 5/30 = 1/6. Together = 6 days.'},
-      {q:'Which Article deals with Right to Constitutional Remedies?',o:['Article 19','Article 25','Article 32','Article 44'],c:[2],e:'Article 32 provides the right to move the Supreme Court for enforcement of fundamental rights.'},
-      {q:'Profit of 20% on CP of ₹500. SP = ?',o:['₹550','₹575','₹600','₹620'],c:[2],e:'SP = CP × (1 + profit%) = 500 × 1.20 = ₹600.'},
-      {q:'Fill in: She __ to school every day.',o:['go','goes','going','gone'],c:[1],e:'Third-person singular present: "She goes to school every day." Subject-verb agreement rule.'},
-      {q:'The Rajya Sabha is presided over by:',o:['Prime Minister','Speaker','Vice President','Chief Justice'],c:[2],e:'The Vice President of India is the ex-officio Chairman of the Rajya Sabha.'},
-      {q:'If A:B = 3:4 and B:C = 2:3, find A:C.',o:['1:2','2:3','3:6','1:3'],c:[0],e:'A:B:C = 3:4 and B:C = 2:3 → scale B: B=4 in first, B=2 in second. Multiply second by 2: B:C=4:6. So A:B:C = 3:4:6. A:C = 3:6 = 1:2.'},
-      {q:'Identify the figure: "The pen is mightier than the sword."',o:['Simile','Metaphor','Personification','Hyperbole'],c:[1],e:'Metaphor — comparing pen to sword without using "like" or "as."'},
-    ],
-    hard:[
-      {q:'If (a+b) = 10 and ab = 21, find a²+b².',o:['52','58','62','100'],c:[1],e:'a²+b² = (a+b)² - 2ab = 100 - 42 = 58.'},
-      {q:'CI on ₹8000 at 10% for 2 years = ?',o:['₹1600','₹1680','₹1700','₹1720'],c:[1],e:'CI = 8000[(1.1)²−1] = 8000 × 0.21 = ₹1680.'},
-      {q:'LCM of 12, 18, 24 is:',o:['48','72','96','36'],c:[1],e:'LCM(12,18,24): 2³×3² = 72.'},
-      {q:'The 10th term of AP: 3, 7, 11, 15...?',o:['35','39','43','47'],c:[1],e:'a=3, d=4. T₁₀ = 3 + (10-1)×4 = 3 + 36 = 39.'},
-      {q:'Passive voice of "She teaches English":',o:['English is taught by her','English was taught by her','English has taught by her','English being taught by her'],c:[0],e:'Simple Present Active → Passive: "English is taught by her."'},
-      {q:'Which Constitutional Amendment added "Secular" to the Preamble?',o:['40th','42nd','44th','52nd'],c:[1],e:'"Socialist" and "Secular" were added by the 42nd Constitutional Amendment (1976).'},
-      {q:'A boat goes 30 km upstream in 6 hrs and 36 km downstream in 4 hrs. Speed of boat in still water:',o:['7.5 km/h','8 km/h','8.5 km/h','9 km/h'],c:[0],e:'Upstream speed=5, Downstream speed=9. Boat speed=(5+9)/2=7.5 km/h.'},
-      {q:'One who is indifferent to pleasure or pain is:',o:['Stoic','Epicurean','Cynic','Altruist'],c:[0],e:'A Stoic is a person who can endure pain or hardship without showing feeling, indifferent to pleasure or pain.'},
-      {q:'Direction: Facing North, turn right 90°, then right again 90°. Now facing:',o:['North','South','East','West'],c:[1],e:'North → Right 90° = East → Right 90° = South. Final direction: South.'},
-      {q:'The Directive Principles of State Policy are in:',o:['Part III','Part IV','Part IVA','Part V'],c:[1],e:'Part IV (Articles 36-51) contains Directive Principles of State Policy.'},
-    ]
-  },
-  rrb:{
-    name:'RRB', icon:'🚂', badge:'eb-rrb', label:'RRB NTPC/JE',
-    desc:'Railway GK, Maths, Reasoning', timer:60,
-    easy:[
-      {q:'Indian Railways was nationalised in:',o:['1947','1950','1951','1953'],c:[3],e:'Indian Railways was fully nationalised on 1 April 1953 when all private railway companies were merged.'},
-      {q:'Which is the fastest train in India?',o:['Rajdhani Express','Shatabdi Express','Vande Bharat Express','Gatimaan Express'],c:[2],e:'Vande Bharat Express is India\'s fastest train, running at up to 160 km/h.'},
-      {q:'A 300m train passes a 200m bridge in 25 sec. Speed of train:',o:['15 m/s','20 m/s','25 m/s','30 m/s'],c:[1],e:'Distance = 300+200 = 500m. Speed = 500/25 = 20 m/s.'},
-      {q:'IRCTC full form:',o:['Indian Railway Catering and Tourism Corporation','Indian Railway Central Travel Company','Indian Railway Commerce & Tourism Corp','Indian Revenue Catering Tourism Corp'],c:[0],e:'IRCTC stands for Indian Railway Catering and Tourism Corporation.'},
-      {q:'Konkan Railway uses which gauge?',o:['Broad Gauge','Metre Gauge','Narrow Gauge','Standard Gauge'],c:[0],e:'Konkan Railway uses Broad Gauge (1676 mm), the standard in India.'},
-      {q:"Ohm's law: V = ?",o:['IR','I/R','I+R','I²R'],c:[0],e:"Ohm's Law: Voltage (V) = Current (I) × Resistance (R)."},
-      {q:'The HQ of Indian Railways is in:',o:['Mumbai','Chennai','Kolkata','New Delhi'],c:[3],e:'The Railway Board, the apex body of Indian Railways, is headquartered in New Delhi.'},
-      {q:'Which is the longest railway platform in India?',o:['Gorakhpur','Kharagpur','Bilaspur','Prayagraj'],c:[0],e:'Gorakhpur Railway Station in Uttar Pradesh holds the record for the longest railway platform in India (~1.3 km).'},
-      {q:'The SI unit of electrical resistance is:',o:['Ampere','Volt','Ohm','Watt'],c:[2],e:'The SI unit of electrical resistance is the Ohm (Ω), named after Georg Simon Ohm.'},
-      {q:'Find the odd one out: 2, 3, 5, 7, 9, 11',o:['3','7','9','11'],c:[2],e:'9 = 3×3 is not a prime number. All others (2,3,5,7,11) are prime numbers.'},
-    ],
-    mid:[
-      {q:'If profit% = 25% and SP = ₹500, find CP.',o:['₹375','₹400','₹425','₹450'],c:[1],e:'CP = SP × 100/(100+profit%) = 500×100/125 = ₹400.'},
-      {q:"Fleming's Left-Hand Rule is used for:",o:['Generators','Electric motors','Transformers','Inductors'],c:[1],e:"Fleming's Left-Hand Rule determines direction of force on a current-carrying conductor in a magnetic field — used for electric motors."},
-      {q:'Which railway zone has HQ at Chennai?',o:['Southern Railway','South Central Railway','South Western Railway','South East Central Railway'],c:[0],e:'Southern Railway (SR) has its headquarters at Chennai.'},
-      {q:'Transformer works on principle of:',o:['Electrostatics','Mutual induction','Self induction','Photoelectric effect'],c:[1],e:'A transformer works on the principle of mutual electromagnetic induction.'},
-      {q:'A train covers 180 km in 3 hours. Speed in km/h:',o:['50','60','70','80'],c:[1],e:'Speed = Distance/Time = 180/3 = 60 km/h.'},
-      {q:'Mixture of 80L has milk:water = 3:1. Water added to make 3:2:',o:['15L','20L','25L','30L'],c:[1],e:'Milk=60L, Water=20L. For 3:2, water needed=40L. Add 40-20=20L.'},
-      {q:'Find next term: 2, 6, 12, 20, 30, ?',o:['40','42','44','46'],c:[1],e:'Differences: 4,6,8,10,12. Next = 30+12 = 42.'},
-      {q:'The first locomotive in India ran between:',o:['Mumbai to Thane','Kolkata to Howrah','Delhi to Agra','Chennai to Arcot'],c:[0],e:'India\'s first passenger train ran between Bombay (Mumbai) and Thane on 16 April 1853.'},
-      {q:'Find the missing number: 6:36 :: 8:?',o:['48','56','64','72'],c:[2],e:'6² = 36, so 8² = 64. The pattern is n:n².'},
-      {q:'Power = Voltage × Current. If V=220V, I=5A, Power =?',o:['44W','110W','1100W','225W'],c:[2],e:'P = V × I = 220 × 5 = 1100 W = 1.1 kW.'},
-    ],
-    hard:[
-      {q:'Efficiency of a steam engine depends on:',o:['Fuel type only','Temperature difference between source and sink','Pressure of steam only','Volume of cylinder'],c:[1],e:'Carnot efficiency = 1 - T_cold/T_hot. Depends on the temperature difference.'},
-      {q:"Kirchhoff's Voltage Law (KVL) states:",o:['Sum of currents at node = 0','Sum of EMFs = sum of drops in a loop','Power in = Power out','Current divides inversely to resistance'],c:[1],e:'KVL: In any closed loop, algebraic sum of EMFs = algebraic sum of voltage drops.'},
-      {q:'If sin θ = 3/5, find cos θ (first quadrant):',o:['4/5','3/4','5/4','5/3'],c:[0],e:'cos²θ = 1-9/25 = 16/25. cosθ = 4/5.'},
-      {q:'RRB NTPC CBT-1 total questions:',o:['80','90','100','120'],c:[2],e:'RRB NTPC CBT-1: 100 questions — 40 GK + 30 Maths + 30 General Intelligence.'},
-      {q:'Which signal does a digital circuit process?',o:['Continuous analogue','Discrete binary 0&1','Sinusoidal','Random noise'],c:[1],e:'Digital circuits process discrete binary signals (0 and 1).'},
-      {q:'A 600W motor lifts 30kg mass 10m in 5 sec. Efficiency:',o:['80%','90%','98%','100%'],c:[3],e:'Work done=mgh=30×10×10=3000J. Energy input=600×5=3000J. Efficiency=100%.'},
-      {q:'The sequence: 1,1,2,3,5,8,13,? is:',o:['18','19','20','21'],c:[3],e:'Fibonacci sequence — each term = sum of two preceding terms. 8+13 = 21.'},
-      {q:'When two trains of length 100m each run in opposite directions at 50 km/h and 40 km/h, time to cross:',o:['5.6s','7.2s','8s','9.6s'],c:[1],e:'Relative speed = 50+40 = 90 km/h = 25 m/s. Distance = 200m. Time = 200/25 = 8s. Wait — 200/25=8s → option C. Actually: 90×1000/3600=25m/s. 200/25=8s.'},
-      {q:'Resistors 3Ω and 6Ω in parallel. Equivalent resistance:',o:['9Ω','2Ω','4Ω','1.5Ω'],c:[1],e:'1/R = 1/3 + 1/6 = 2/6 + 1/6 = 3/6 = 1/2. R = 2Ω.'},
-      {q:'Simplify: (x² - 9)/(x - 3):',o:['x-3','x+3','x²+3','x²-3'],c:[1],e:'(x²-9)/(x-3) = (x+3)(x-3)/(x-3) = x+3.'},
-    ]
-  },
-  banking:{
-    name:'Banking', icon:'🏦', badge:'eb-bank', label:'IBPS/SBI/RBI',
-    desc:'Finance, RBI, Schemes', timer:45,
-    easy:[
-      {q:'RBI stands for:',o:['Reserve Bank of India','Regulated Bank of India','Revenue Bank of India','Rural Bank of India'],c:[0],e:'RBI (Reserve Bank of India) is India\'s central bank, established on 1 April 1935.'},
-      {q:'NEFT stands for:',o:['National Electronic Funds Transfer','National Electronic Fund Transaction','Net Electronic Funds Transfer','National Emergency Fund Transfer'],c:[0],e:'NEFT (National Electronic Funds Transfer) is an RBI-operated system for bank-to-bank money transfers.'},
-      {q:'Repo rate is the rate at which:',o:['Banks lend to public','RBI lends to commercial banks','Government borrows from RBI','Banks lend to each other'],c:[1],e:'Repo Rate is the rate at which the RBI lends short-term money to commercial banks.'},
-      {q:'KYC stands for:',o:['Know Your Customer','Key Your Customer','Keep Your Credentials','Know Your Credit'],c:[0],e:'KYC (Know Your Customer) is a mandatory identity verification process by banks.'},
-      {q:'A sum doubles in 8 years at SI. Rate of interest:',o:['10%','12.5%','15%','8%'],c:[1],e:'For SI: Time = 100/Rate. 8 = 100/R → R = 12.5%.'},
-      {q:'The currency note of ₹500 has whose portrait?',o:['Mahatma Gandhi','Jawaharlal Nehru','B.R. Ambedkar','Subhas Chandra Bose'],c:[0],e:'All Indian currency notes feature the portrait of Mahatma Gandhi since 1996.'},
-      {q:'Which bank is the banker\'s bank in India?',o:['SBI','HDFC','RBI','NABARD'],c:[2],e:'The Reserve Bank of India (RBI) is called the "banker\'s bank" as it manages banking system operations.'},
-      {q:'IMPS allows transfers:',o:['Only during banking hours','24×7 including holidays','Only weekdays','Only within same bank'],c:[1],e:'IMPS (Immediate Payment Service) allows instant 24×7 interbank fund transfers including Sundays and holidays.'},
-      {q:'Minimum balance in Jan Dhan account:',o:['₹500','₹1000','Zero balance','₹100'],c:[2],e:'Pradhan Mantri Jan Dhan Yojana (PMJDY) accounts are zero-balance accounts with basic banking facilities.'},
-      {q:'SBI stands for:',o:['State Bank of India','Small Bank of India','Standard Bank of India','Savings Bank of India'],c:[0],e:'SBI (State Bank of India) is the largest public sector bank in India, headquartered in Mumbai.'},
-    ],
-    mid:[
-      {q:'Basel III norms are related to:',o:['Agricultural lending','Capital adequacy of banks','FDI limits','Interest rate policy'],c:[1],e:'Basel III is a global regulatory framework on bank capital adequacy, stress testing, and liquidity requirements.'},
-      {q:'CRR stands for:',o:['Cash Reserve Ratio','Credit Reserve Rate','Central Reserve Ratio','Currency Reserve Requirement'],c:[0],e:'CRR is the percentage of deposits banks must hold in reserve with the RBI.'},
-      {q:'SARFAESI Act is related to:',o:['Corporate tax','NPA recovery by banks','Insurance regulation','Securities market'],c:[1],e:'SARFAESI Act 2002 enables banks to recover NPAs by enforcing security interest without court intervention.'},
-      {q:'Which bank is NOT nationalised?',o:['Punjab National Bank','HDFC Bank','Bank of Baroda','Canara Bank'],c:[1],e:'HDFC Bank is a private sector bank. PNB, BoB, Canara are nationalised banks.'},
-      {q:'CI on ₹10000 at 10% for 3 years:',o:['₹3000','₹3100','₹3310','₹3200'],c:[2],e:'CI = 10000[(1.1)³-1] = 10000 × 0.331 = ₹3310.'},
-      {q:'Priority Sector Lending target for domestic banks is:',o:['30%','35%','40%','45%'],c:[2],e:'RBI mandates domestic banks to lend at least 40% of ANBC to priority sectors.'},
-      {q:'NABARD is related to:',o:['Export finance','Agriculture and rural finance','Foreign exchange','Urban housing'],c:[1],e:'NABARD (National Bank for Agriculture and Rural Development) focuses on agricultural credit and rural development.'},
-      {q:'SLR stands for:',o:['Statutory Liquidity Ratio','Standard Lending Rate','Scheduled Loan Reserve','Savings Liquidity Rate'],c:[0],e:'SLR is the percentage of deposits banks must maintain in liquid assets like government securities.'},
-      {q:'Which scheme provides accident insurance for ₹2 lakh at ₹12/year?',o:['PMJDY','PMJJBY','PMSBY','APY'],c:[2],e:'Pradhan Mantri Suraksha Bima Yojana (PMSBY) offers accident insurance of ₹2 lakh for just ₹12 per year.'},
-      {q:'Reverse Repo Rate: RBI __ from commercial banks.',o:['Lends money','Borrows money','Takes deposits from public','Regulates forex'],c:[1],e:'Reverse Repo Rate is the rate at which RBI borrows funds from commercial banks, absorbing excess liquidity.'},
-    ],
-    hard:[
-      {q:'Under PMJDY, overdraft facility available up to:',o:['₹5000','₹10000','₹15000','₹2000'],c:[1],e:'Under PMJDY, eligible account holders get an overdraft facility up to ₹10,000.'},
-      {q:'Narrow Banking means banks invest deposits in:',o:['Risky corporate bonds','Government securities only','Real estate','Equity shares'],c:[1],e:'Narrow banking restricts banks to invest only in government/low-risk securities.'},
-      {q:'CRAR under Basel III for Indian banks must be minimum:',o:['8%','9%','10%','11.5%'],c:[3],e:'Indian banks must maintain minimum CRAR of 11.5% including capital conservation buffer.'},
-      {q:'Which Committee recommended setting up NABARD?',o:['Narasimham','Shivaraman','Nayak','Kelkar'],c:[1],e:'The B. Sivaraman Committee (1979) recommended establishing NABARD for agricultural and rural finance.'},
-      {q:'OMO by RBI involves:',o:['Buying/selling foreign currency','Buying/selling government securities','Setting interest rates','Regulating NBFCs'],c:[1],e:'Open Market Operations (OMO) — RBI buys or sells government securities to control money supply.'},
-      {q:'CIBIL score range is:',o:['0-500','300-900','100-800','500-1000'],c:[1],e:'CIBIL (Credit Information Bureau India) credit score ranges from 300 to 900. A score above 750 is considered good.'},
-      {q:'The Prompt Corrective Action (PCA) framework is for:',o:['Well-performing banks','Weak banks with stressed financials','NBFC regulation','Micro-finance'],c:[1],e:'RBI\'s PCA framework is triggered for banks with high NPAs, low capital or negative ROA to restrict risky operations.'},
-      {q:'Which instrument is NOT a money market instrument?',o:['Treasury Bills','Commercial Paper','Equity Shares','Certificate of Deposit'],c:[2],e:'Equity shares are capital market instruments, not money market. T-Bills, CP, and CD are all short-term money market instruments.'},
-      {q:'APY (Atal Pension Yojana) is targeted at:',o:['Government employees','Unorganised sector workers','Senior citizens','Students'],c:[1],e:'APY targets workers in the unorganised sector to provide them a defined pension after age 60.'},
-      {q:'RTGS minimum transaction amount:',o:['₹1 lakh','₹2 lakh','No minimum','₹50,000'],c:[1],e:'RTGS (Real Time Gross Settlement) is used for high-value transactions — minimum ₹2 lakh.'},
-    ]
-  },
-  upsc:{
-    name:'UPSC', icon:'🏅', badge:'eb-upsc', label:'UPSC CSE/IAS',
-    desc:'Constitution, Geography, Policy', timer:120,
-    easy:[
-      {q:'The Preamble of the Indian Constitution begins with:',o:['"We the People of India"','The sovereign state of India','India that is Bharat','The Constitution of India'],c:[0],e:'The Preamble begins with "WE, THE PEOPLE OF INDIA" asserting its democratic foundation.'},
-      {q:'Indian Constitution was adopted on:',o:['15 August 1947','26 January 1950','26 November 1949','2 October 1949'],c:[2],e:'Constitution was adopted on 26 November 1949 (Constitution Day) and came into force on 26 January 1950.'},
-      {q:'India is described as a:',o:['Federal state','Unitary state','Quasi-federal state','Confederation'],c:[2],e:'India has a quasi-federal structure — stronger centre but with federal features.'},
-      {q:'Judicial Review in India is borrowed from:',o:['UK','USA','Canada','Australia'],c:[1],e:'Judicial Review — power to declare laws unconstitutional — is borrowed from the USA.'},
-      {q:'Who chairs the NITI Aayog?',o:['Finance Minister','RBI Governor','Prime Minister','Home Minister'],c:[2],e:'The Prime Minister of India is the ex-officio Chairman of NITI Aayog (replaced Planning Commission in 2015).'},
-      {q:'Lok Sabha has maximum how many members?',o:['543','545','552','530'],c:[2],e:'The Constitution provides for maximum 552 members in Lok Sabha: 530 from states + 20 from UTs + 2 nominated Anglo-Indians (now removed by 104th Amendment).'},
-      {q:'India follows which type of democratic system?',o:['Presidential','Parliamentary','Semi-presidential','Direct democracy'],c:[1],e:'India follows a Parliamentary form of democracy where the executive is accountable to the legislature.'},
-      {q:'The Comptroller and Auditor General of India is appointed by:',o:['Prime Minister','Parliament','President','Chief Justice'],c:[2],e:'The CAG is appointed by the President of India under Article 148 of the Constitution.'},
-      {q:'Which Article provides Right to Life and Personal Liberty?',o:['Article 14','Article 19','Article 20','Article 21'],c:[3],e:'Article 21 guarantees that no person shall be deprived of life or personal liberty except by procedure established by law.'},
-      {q:'The Rajya Sabha has maximum how many members?',o:['238','245','250','260'],c:[1],e:'Rajya Sabha has max 245 members: 233 elected by States/UTs + 12 nominated by the President.'},
-    ],
-    mid:[
-      {q:'Collective responsibility of Cabinet is under which Article?',o:['Article 74','Article 75','Article 76','Article 78'],c:[1],e:'Article 75(3) states that the Council of Ministers is collectively responsible to the House of the People (Lok Sabha).'},
-      {q:'Directive Principles of State Policy are in which Part?',o:['Part III','Part IV','Part IVA','Part V'],c:[1],e:'Part IV (Articles 36-51) contains DPSP — non-justiciable but fundamental to governance.'},
-      {q:'La Niña leads to:',o:['Warmer Pacific','Cooler Pacific & stronger India monsoon','Droughts in India','Warmer Indian Ocean'],c:[1],e:'La Niña (cooling of central/eastern Pacific) typically strengthens the Indian summer monsoon.'},
-      {q:'Which gas primarily causes the Greenhouse Effect?',o:['Oxygen','Nitrogen','Carbon Dioxide','Argon'],c:[2],e:'CO₂ is the dominant anthropogenic greenhouse gas contributing to global warming.'},
-      {q:'Biodiversity Hotspots must have ≥1500 endemic plants AND have lost:',o:['50% habitat','60% habitat','70% habitat','80% habitat'],c:[2],e:'A biodiversity hotspot must have ≥1500 endemic vascular plants AND have lost ≥70% of original habitat.'},
-      {q:'"Secular" added to Preamble by which Amendment?',o:['40th','42nd','44th','52nd'],c:[1],e:'"Socialist" and "Secular" were added to the Preamble by the 42nd Constitutional Amendment (1976).'},
-      {q:'Which is NOT a feature of Federal government?',o:['Dual government','Written Constitution','Single Citizenship','Judicial Review'],c:[2],e:'Single Citizenship is a unitary feature. Federal systems like USA have dual citizenship (national + state). India has only single citizenship.'},
-      {q:'The Westerlies blow from:',o:['Equator to poles','Subtropical to sub-polar','Polar to subtropical','Tropics to equator'],c:[1],e:'Westerlies blow from subtropical high pressure (30°) to sub-polar low pressure (60°) zones in both hemispheres.'},
-      {q:'Which Amendment lowered the voting age from 21 to 18?',o:['42nd','44th','61st','73rd'],c:[2],e:'The 61st Constitutional Amendment (1988) lowered the voting age from 21 to 18 years.'},
-      {q:'The El Niño effect causes:',o:['Heavy monsoon in India','Drought-like conditions in India','No effect on India','Floods in North India'],c:[1],e:'El Niño (warming of Pacific) typically weakens the Indian monsoon, causing below-normal rainfall and drought conditions.'},
-    ],
-    hard:[
-      {q:'Anti-defection provisions are in which Schedule?',o:['Eighth','Ninth','Tenth','Eleventh'],c:[2],e:'The Tenth Schedule (added by 52nd Amendment, 1985) contains anti-defection provisions.'},
-      {q:'Precautionary Principle in environmental law means:',o:['Polluter pays','Preventive action under uncertainty','EIA mandatory','Biodiversity compensation'],c:[1],e:'Precautionary Principle: lack of full scientific certainty should not delay preventive action against environmental threats.'},
-      {q:'"Basic Structure" doctrine was established in:',o:['A.K. Gopalan case','Golak Nath case','Kesavananda Bharati case','Minerva Mills case'],c:[2],e:'Kesavananda Bharati v. State of Kerala (1973) — 13-judge bench — established the Basic Structure Doctrine.'},
-      {q:'Which Finance Commission recommended GST Council?',o:['12th','13th','14th','15th'],c:[1],e:'The 13th Finance Commission (2010) recommended creation of a GST Council, later established under Article 279A.'},
-      {q:'UNFCCC COP is held:',o:['Every 5 years','Every year','Twice a year','Every 2 years'],c:[1],e:'UNFCCC COP (Conference of Parties) is held annually — e.g., COP21 Paris 2015, COP26 Glasgow 2021, COP28 Dubai 2023.'},
-      {q:'Doctrine of Colourable Legislation means:',o:['Unconstitutional law made colourful','Legislature cannot do indirectly what it cannot do directly','Coloured laws for specific groups','Emergency provisions only'],c:[1],e:'Doctrine of Colourable Legislation: what cannot be done directly by a legislature cannot be done indirectly by giving it a different colour or form.'},
-      {q:'Which Article deals with the procedure for Constitutional Amendment?',o:['Article 352','Article 356','Article 368','Article 370'],c:[2],e:'Article 368 provides the power and procedure for amendment of the Constitution of India.'},
-      {q:'The concept of "Creamy Layer" in OBC reservations was first defined in:',o:['Mandal Commission Report','Indra Sawhney case','M. Nagaraj case','Balaji case'],c:[1],e:'Indra Sawhney v. Union of India (1992) upheld OBC reservations but introduced the "creamy layer" exclusion.'},
-      {q:'Which is the largest biome on Earth by area?',o:['Tropical Rainforest','Savanna','Taiga (Boreal Forest)','Tundra'],c:[2],e:'Taiga (Boreal Forest) is the largest terrestrial biome, stretching across North America, Europe, and Asia.'},
-      {q:'The River Luni drains into:',o:['Bay of Bengal','Arabian Sea','Rann of Kutch','Indian Ocean'],c:[2],e:'The Luni River originates in the Aravalli Range and drains into the Rann of Kutch in Gujarat.'},
-    ]
-  },
-  ese:{
-    name:'ESE/IES', icon:'⚙️', badge:'eb-ese', label:'Eng. Services',
-    desc:'Engineering (all branches)', timer:90,
-    easy:[
-      {q:"Ohm's law applies to which type of conductors?",o:['Non-linear','Linear','Semiconductor','Superconductor'],c:[1],e:"Ohm's Law (V=IR) applies to ohmic/linear conductors where resistance is constant."},
-      {q:'The SI unit of power is:',o:['Joule','Newton','Watt','Pascal'],c:[2],e:'Watt (W) is the SI unit of power = energy per unit time = J/s.'},
-      {q:'Material with the highest thermal conductivity:',o:['Iron','Copper','Diamond','Aluminium'],c:[2],e:'Diamond has the highest thermal conductivity (~2000 W/m·K) among natural materials.'},
-      {q:'Pascal is the unit of:',o:['Force','Pressure','Energy','Power'],c:[1],e:'Pascal (Pa) is the SI unit of pressure = Force/Area = N/m².'},
-      {q:'Carnot efficiency between 500K and 300K is:',o:['30%','40%','50%','60%'],c:[1],e:'Efficiency = 1 - T_cold/T_hot = 1 - 300/500 = 0.40 = 40%.'},
-      {q:'AND gate output is 1 only when:',o:['Any input is 1','Both inputs are 0','Both inputs are 1','Any input is 0'],c:[2],e:'AND gate: output HIGH only when ALL inputs are HIGH.'},
-      {q:'Hook\'s Law states that stress is proportional to:',o:['Volume','Strain','Temperature','Velocity'],c:[1],e:"Hooke's Law: Within elastic limit, stress is directly proportional to strain. σ = E × ε."},
-      {q:'The unit of capacitance is:',o:['Henry','Ohm','Farad','Tesla'],c:[2],e:'Farad (F) is the SI unit of capacitance. 1 Farad = 1 Coulomb per Volt.'},
-      {q:'Kirchhoff\'s Current Law states:',o:['V=IR','Sum of currents at a junction = 0','P=VI','Sum of voltages in loop = 0'],c:[1],e:"KCL: The algebraic sum of currents entering and leaving a node = 0 (charge conservation)."},
-      {q:'Shear stress is defined as force per:',o:['Volume','Area parallel to force','Area perpendicular to force','Length'],c:[1],e:'Shear stress = Force / Area parallel to the force. Unlike normal stress which acts perpendicular.'},
-    ],
-    mid:[
-      {q:"Bernoulli's equation is based on conservation of:",o:['Mass','Momentum','Energy','Charge'],c:[2],e:"Bernoulli's equation: P + ½ρv² + ρgh = constant (energy conservation in fluid flow)."},
-      {q:'Resonant frequency of an LC circuit:',o:['1/(2π√LC)','2π√LC','1/(LC)','√(L/C)'],c:[0],e:'f = 1/(2π√LC), where L=inductance, C=capacitance.'},
-      {q:'Simply supported beam with UDL w. Max bending moment:',o:['wL²/4','wL²/8','wL²/12','wL/2'],c:[1],e:'For simply supported beam with UDL, max BM at midspan = wL²/8.'},
-      {q:'Laplace transform of e^(at):',o:['1/(s+a)','1/(s-a)','s/(s-a)','a/(s-a)'],c:[1],e:'L{e^(at)} = 1/(s-a), valid for s > a.'},
-      {q:'Stress = Force/Area. Area doubles, force constant, stress:',o:['Doubles','Halves','Stays same','Quadruples'],c:[1],e:'Stress ∝ 1/Area. Double area → half stress.'},
-      {q:'TCP operates at which OSI layer?',o:['Network','Transport','Session','Application'],c:[1],e:'TCP (Transmission Control Protocol) operates at Layer 4 (Transport) of the OSI model.'},
-      {q:'The specific speed of a turbine defines:',o:['Speed of runner','Speed of geometrically similar turbine of unit dimensions','Speed at maximum efficiency','Rotational speed in rpm'],c:[1],e:'Specific speed = speed of geometrically similar turbine generating unit power under unit head. Used for turbine selection.'},
-      {q:'Poisson\'s ratio is defined as:',o:['Lateral strain / Longitudinal strain','Stress / Strain','Shear stress / Normal stress','Modulus / Stiffness'],c:[0],e:"Poisson's ratio μ = −(Lateral strain)/(Longitudinal strain). Typically 0.25 to 0.35 for metals."},
-      {q:'The Reynolds number determines:',o:['Heat transfer','Flow regime (laminar/turbulent)','Pressure drop only','Viscosity'],c:[1],e:'Re = ρvD/μ. Re < 2000: laminar; Re > 4000: turbulent. It determines the nature of fluid flow.'},
-      {q:'MOSFET is a:',o:['Bipolar device','Unipolar (field-effect) device','Passive device','Magnetic device'],c:[1],e:'MOSFET (Metal-Oxide-Semiconductor Field-Effect Transistor) is a unipolar device controlled by electric field (voltage).'},
-    ],
-    hard:[
-      {q:'Which is NOT a thermodynamic property?',o:['Enthalpy','Entropy','Heat','Internal Energy'],c:[2],e:'Heat (Q) and Work (W) are path functions. Enthalpy, Entropy, Internal Energy are state properties.'},
-      {q:"Mohr's circle is used to find:",o:['Principal stresses','Flow velocities','Bending moments','Natural frequencies'],c:[0],e:"Mohr's Circle graphically represents stress transformation — gives principal stresses and max shear stress."},
-      {q:'Z-transform of unit step u[n]:',o:['1/(z-1)','z/(z-1)','1/z','z'],c:[1],e:'Z{u[n]} = z/(z-1) for |z|>1, from geometric series sum.'},
-      {q:'Rankine cycle is used for:',o:['Gas turbines','Refrigeration','Steam power plants','IC engines'],c:[2],e:'Rankine cycle is the ideal thermodynamic cycle for steam power plants.'},
-      {q:'Feedback control system stable if all poles in:',o:['On imaginary axis','Right half s-plane','Left half s-plane','At origin'],c:[2],e:'For BIBO stability, all poles must lie in the Left Half of the s-plane (negative real parts).'},
-      {q:"Euler's buckling load for pin-pin column:",o:['π²EI/L²','4π²EI/L²','π²EI/4L²','2π²EI/L²'],c:[0],e:"P_cr = π²EI/L² for pin-pin (both ends hinged) column of length L."},
-      {q:'In a PID controller, Integral action eliminates:',o:['Overshoot','Steady-state error','Oscillations','Derivative kick'],c:[1],e:'The Integral (I) term in PID eliminates steady-state error by accumulating past error over time.'},
-      {q:'The Nyquist sampling theorem states: sampling rate must be:',o:['Equal to signal frequency','At least twice signal frequency','Half signal frequency','Ten times signal frequency'],c:[1],e:'Nyquist theorem: to avoid aliasing, sampling rate must be ≥ 2 × maximum signal frequency (Nyquist rate).'},
-      {q:'Degree of indeterminacy of a fixed-fixed beam:',o:['1','2','3','4'],c:[2],e:'A fixed-fixed beam has 3 degrees of static indeterminacy — 6 reactions - 3 equilibrium equations = 3.'},
-      {q:'In VLSI design, CMOS technology uses:',o:['Only NMOS','Only PMOS','Both NMOS and PMOS','Bipolar transistors'],c:[2],e:'CMOS (Complementary MOS) uses both NMOS and PMOS transistors in complementary pairs for low power consumption.'},
-    ]
-  },
-  gate:{
-    name:'GATE', icon:'🔬', badge:'eb-gate', label:'GATE',
-    desc:'CS — Algorithms, OS, Networks', timer:120,
-    easy:[
-      {q:'Worst-case time complexity of linear search:',o:['O(1)','O(log n)','O(n)','O(n²)'],c:[2],e:'Linear search scans each element. Worst case = last position or absent → O(n).'},
-      {q:'Which data structure uses LIFO?',o:['Queue','Stack','Linked List','Tree'],c:[1],e:'Stack uses LIFO (Last In First Out). Push adds to top, Pop removes from top.'},
-      {q:'DFA accepts which type of language?',o:['Type-0','Type-1','Type-2','Type-3 (Regular)'],c:[3],e:'DFAs accept Regular Languages (Type-3 in Chomsky hierarchy).'},
-      {q:'Binary tree with n nodes has how many NULL pointers?',o:['n-1','n','n+1','2n'],c:[2],e:'Total links=2n, internal=n-1, NULL=2n-(n-1)=n+1.'},
-      {q:'Full binary tree with n internal nodes has leaves:',o:['n','n-1','n+1','2n'],c:[2],e:'Full binary tree: leaves = internal nodes + 1 = n+1.'},
-      {q:'SQL WHERE clause does:',o:['Groups rows','Sorts rows','Filters rows before grouping','Filters groups'],c:[2],e:'WHERE filters rows before grouping. HAVING filters groups after GROUP BY.'},
-      {q:'HTTP default port is:',o:['21','22','80','443'],c:[2],e:'HTTP uses port 80 by default. HTTPS uses port 443. FTP uses 21, SSH uses 22.'},
-      {q:'Which layer of OSI handles routing?',o:['Data Link','Network','Transport','Session'],c:[1],e:'The Network Layer (Layer 3) handles routing of packets across networks using IP addresses.'},
-      {q:'Primary key in relational database must be:',o:['Unique only','Not null only','Unique and not null','Indexed only'],c:[2],e:'Primary key must be UNIQUE (no duplicates) and NOT NULL to uniquely identify each row.'},
-      {q:'Which is NOT a valid IPv4 address?',o:['192.168.1.1','10.0.0.1','256.1.1.1','172.16.0.1'],c:[2],e:'IPv4 octets range from 0-255. 256 is invalid, so 256.1.1.1 is not a valid IPv4 address.'},
-    ],
-    mid:[
-      {q:'Best worst-case sorting algorithm:',o:['Quick Sort','Bubble Sort','Merge Sort','Insertion Sort'],c:[2],e:'Merge Sort guarantees O(n log n) in all cases. QuickSort can be O(n²) worst case.'},
-      {q:'Fourth deadlock condition (after Mutual Exclusion, Hold-Wait, No Preemption):',o:['Priority Inversion','Circular Wait','Starvation','Context Switch'],c:[1],e:"Coffman's four conditions: Mutual Exclusion, Hold and Wait, No Preemption, Circular Wait."},
-      {q:'Minimal super key in relational DB is called:',o:['Primary Key','Super Key','Candidate Key','Foreign Key'],c:[2],e:'A Candidate Key is a minimal super key — no proper subset can uniquely identify tuples.'},
-      {q:'Virtual memory uses:',o:['Cache mapping','Demand paging','RAID storage','DMA transfer'],c:[1],e:'Virtual memory uses demand paging — pages loaded to RAM only when needed.'},
-      {q:'CFL L = {aⁿbⁿ | n≥1} accepted by:',o:['DFA','NFA','Push-Down Automaton','Turing Machine'],c:[2],e:'CFL {aⁿbⁿ} requires a stack → accepted by Push-Down Automata (PDA).'},
-      {q:'Eigenvalues of [[2,1],[1,2]]:',o:['1,3','2,2','0,4','1,2'],c:[0],e:'λ²-4λ+3=0 → (λ-1)(λ-3)=0 → eigenvalues = 1, 3.'},
-      {q:'TCP vs UDP: TCP provides:',o:['Faster delivery','Connectionless service','Reliable ordered delivery','No error checking'],c:[2],e:'TCP provides reliable, ordered, error-checked delivery via connection (3-way handshake). UDP is faster but unreliable.'},
-      {q:'Which is a greedy algorithm?',o:['Dynamic Programming','Dijkstra\'s shortest path','Floyd-Warshall','Bellman-Ford'],c:[1],e:"Dijkstra's algorithm is a greedy algorithm — it selects the minimum weight edge at each step."},
-      {q:'Page replacement algorithm with minimum page faults (theoretically optimal):',o:['LRU','FIFO','Optimal (OPT)','LFU'],c:[2],e:'Optimal (OPT/Belady) algorithm replaces the page not used for the longest time in future — theoretically optimal but not implementable.'},
-      {q:'In a B-tree of order m, each node has max how many children?',o:['m-1','m','m+1','2m'],c:[1],e:'In a B-tree of order m, each node has at most m children and at most m-1 keys.'},
-    ],
-    hard:[
-      {q:'CPU scheduling that may cause starvation:',o:['FCFS','Round Robin','Priority Scheduling','SRTF'],c:[2,3],multi:true,e:'Both Priority Scheduling and SRTF can cause starvation of low-priority/long processes.'},
-      {q:'NP-Complete problems: every NP problem __ to them.',o:['Cannot be reduced','Reduces in polynomial time','Reduces in exponential time','Is equivalent'],c:[1],e:'NP-Complete: every NP problem reduces to them in polynomial time. P=NP if any NPC solved in poly time.'},
-      {q:'Master Theorem T(n)=2T(n/2)+n:',o:['O(n)','O(n log n)','O(n²)','O(log n)'],c:[1],e:'Case 2: f(n)=Θ(n^log_b a) → T(n)=O(n log n).'},
-      {q:'Bellman-Ford detects:',o:['Only shortest path','Negative weight cycles','Minimum spanning tree','Maximum flow'],c:[1],e:'Bellman-Ford finds shortest paths with negative edges AND detects negative weight cycles.'},
-      {q:'2-3-4 tree equivalent to:',o:['AVL Tree','Splay Tree','Red-Black Tree','B+ Tree'],c:[2],e:'2-3-4 tree is isomorphic to Red-Black Tree.'},
-      {q:'Semaphore P(S) operation:',o:['S=S+1; signal','S=S-1; if S<0 block','S=S+1; unblock','S=0; reset'],c:[1],e:'P(S): S=S-1. If S<0, process is blocked (added to wait queue).'},
-      {q:'Context-Free Grammar that generates {ww^R | w∈{a,b}*} requires:',o:['DFA','NFA','PDA','Turing Machine'],c:[2],e:'Palindrome-like CFL {ww^R} requires a PDA (stack) to push w and match with w^R.'},
-      {q:'Which normal form eliminates transitive dependencies?',o:['1NF','2NF','3NF','BCNF'],c:[2],e:'3NF eliminates transitive dependencies: non-key attributes must depend only on primary key, not on other non-key attributes.'},
-      {q:'In Dining Philosophers problem, deadlock prevention by:',o:['Allowing all to pick left fork first','Limiting one philosopher from picking','Mutual exclusion only','Resource preemption only'],c:[1],e:'One solution: allow at most (n-1) philosophers to pick simultaneously. Or asymmetric solution: one philosopher picks right fork first.'},
-      {q:'Which cache replacement policy uses frequency of access?',o:['LRU','FIFO','LFU','MRU'],c:[2],e:'LFU (Least Frequently Used) evicts the page accessed least number of times. LRU uses recency, not frequency.'},
-    ]
-  },
-  ugcnet:{
-    name:'UGC NET', icon:'🎓', badge:'eb-ugc', label:'UGC NET',
-    desc:'Research, Education, Statistics', timer:90,
-    easy:[
-      {q:'UGC NET qualifies for:',o:['Bank Manager','Assistant Professor/JRF','IAS Officer','School Teacher'],c:[1],e:'UGC NET qualifies candidates for Assistant Professor and Junior Research Fellowship (JRF) positions.'},
-      {q:'First widely used high-level programming language:',o:['Assembly','FORTRAN','COBOL','C'],c:[1],e:'FORTRAN (1957) is considered the first widely used high-level programming language.'},
-      {q:'Theory of Multiple Intelligences was propounded by:',o:['Piaget','Vygotsky','Gardner','Bloom'],c:[2],e:"Howard Gardner proposed 8+ types of intelligence in 'Frames of Mind' (1983)."},
-      {q:'"Pedagogy" refers to:',o:['Art of learning','Art and science of teaching','Curriculum design','Student assessment'],c:[1],e:'Pedagogy is the art, science, and practice of teaching.'},
-      {q:'Research hypothesis is:',o:['Final conclusion','Tentative testable assumption','Literature review','Data analysis result'],c:[1],e:'Research hypothesis is a tentative, testable statement about expected relationship between variables.'},
-      {q:'ISBN stands for:',o:['International Standard Book Number','Indian Standard Book Number','International Series Book Name','Indexed Standard Bibliography Number'],c:[0],e:'ISBN (International Standard Book Number) is a 13-digit unique identifier assigned to books for commercial purposes.'},
-      {q:'Plagiarism means:',o:['Proper citation of sources','Using others\' work without credit','Original research','Peer review'],c:[1],e:'Plagiarism is the act of using someone else\'s work, ideas, or expressions without proper attribution or permission.'},
-      {q:'Bloom\'s Taxonomy was proposed in:',o:['1946','1956','1966','1976'],c:[1],e:"Benjamin Bloom and colleagues developed the Taxonomy of Educational Objectives in 1956."},
-      {q:'Formative assessment is done:',o:['After completing course','During learning process','Before admission','Once a year only'],c:[1],e:'Formative assessment occurs during the learning process to monitor student progress and provide ongoing feedback.'},
-      {q:'ICT in education stands for:',o:['International Communication Technology','Information and Communication Technology','Integrated Computer Training','Indian Curriculum Technology'],c:[1],e:'ICT stands for Information and Communication Technology — digital tools used to enhance teaching and learning.'},
-    ],
-    mid:[
-      {q:'Sampling technique with equal probability for all:',o:['Cluster sampling','Stratified sampling','Simple Random Sampling','Purposive sampling'],c:[2],e:'Simple Random Sampling (SRS) gives every member equal and independent chance of selection.'},
-      {q:'p-value in hypothesis testing represents:',o:['Confidence level','Probability of results given null hypothesis is true','Effect size','Sample variance'],c:[1],e:'p-value = probability of obtaining results as extreme as observed, assuming null hypothesis is true.'},
-      {q:'Constructivism in education — primary proponent:',o:['B.F. Skinner','John Dewey','Jean Piaget','Ivan Pavlov'],c:[2],e:"Piaget's cognitive constructivism: learners actively construct knowledge through experience."},
-      {q:'TCP/IP model has how many layers?',o:['4','5','6','7'],c:[0],e:'TCP/IP has 4 layers: Application, Transport, Internet, Network Access. OSI has 7.'},
-      {q:'DOI in academic publishing stands for:',o:['Department of Information','Digital Object Identifier','Data Output Index','Document Origin ID'],c:[1],e:'DOI is a persistent alphanumeric string providing a permanent internet link to a document.'},
-      {q:"Revised Bloom's Taxonomy highest level:",o:['Analysis','Evaluation','Synthesis','Create'],c:[3],e:"Revised Bloom's (2001): Remember, Understand, Apply, Analyse, Evaluate, Create. 'Create' is highest."},
-      {q:'Mode in statistics is:',o:['Middle value','Average value','Most frequent value','Range/2'],c:[2],e:'Mode is the value that appears most frequently in a dataset. A dataset can have multiple modes.'},
-      {q:'Regression analysis is used to:',o:['Classify data','Predict relationship between variables','Test normality','Measure central tendency'],c:[1],e:'Regression analysis examines the relationship between dependent and independent variables to make predictions.'},
-      {q:'Which is a qualitative research method?',o:['Randomised Control Trial','Survey with Likert scale','Ethnography','Structural Equation Modelling'],c:[2],e:'Ethnography is a qualitative method involving in-depth observation and interpretation of cultural practices.'},
-      {q:'Null hypothesis (H₀) in research assumes:',o:['Significant difference exists','No significant difference exists','Positive correlation','Causal relationship'],c:[1],e:'Null hypothesis assumes no significant difference or relationship exists between variables being tested.'},
-    ],
-    hard:[
-      {q:'Type I error in hypothesis testing:',o:['Accepting false null hypothesis','Rejecting true null hypothesis','Wrong sample size','Wrong test statistic'],c:[1],e:'Type I Error (α): Rejecting the null hypothesis when it is actually true (false positive).'},
-      {q:'Von Neumann bottleneck caused by:',o:['Multiple CPUs','Single shared bus for data and instructions','Cache miss','Parallel processing'],c:[1],e:'Von Neumann bottleneck: CPU and memory share one bus for both data and instructions, limiting throughput.'},
-      {q:'Action Research is best described as:',o:['Pure theoretical research','Practitioner-led inquiry to improve practice','Secondary data analysis','Randomised control trial'],c:[1],e:'Action Research: cyclical process by practitioners to identify problems, implement changes, evaluate outcomes.'},
-      {q:'Factor Analysis reduces variables to fewer:',o:['Respondents','Underlying factors/dimensions','Datasets','Hypotheses'],c:[1],e:'Factor Analysis identifies latent factors underlying correlations among many observed variables.'},
-      {q:'Turnitin checks for:',o:['Grammar errors','Code plagiarism','Textual similarity/plagiarism','Citation format'],c:[2],e:'Turnitin compares submitted text against a database to detect textual similarity and potential plagiarism.'},
-      {q:'"Zone of Proximal Development" (ZPD) belongs to:',o:['Piaget','Vygotsky','Bruner','Ausubel'],c:[1],e:"Vygotsky's ZPD is the gap between what a learner can do independently vs. with guidance."},
-      {q:'Chi-square test is used for:',o:['Comparing means','Testing association between categorical variables','Correlation of continuous data','Regression analysis'],c:[1],e:'Chi-square (χ²) test examines whether there is a significant association between two categorical variables.'},
-      {q:'Phenomenological research focuses on:',o:['Statistical patterns','Lived experience of individuals','Experimental control groups','Large sample surveys'],c:[1],e:'Phenomenological research explores the lived experiences and subjective meanings of individuals about a phenomenon.'},
-      {q:'Cronbach\'s Alpha measures:',o:['Test validity','Internal consistency/reliability','Factor loading','Correlation coefficient'],c:[1],e:"Cronbach's Alpha measures internal consistency reliability of a scale — α ≥ 0.7 is generally acceptable."},
-      {q:'Grounded Theory in research generates:',o:['Confirms existing theories','Theory from data systematically','Statistical models','Descriptive statistics only'],c:[1],e:"Grounded Theory (Glaser & Strauss, 1967) generates theory inductively from systematically collected and analysed data."},
-    ]
-  }
-};
-
+// DB loaded from db.js
+void DB; // ensure DB is available
 // ══════════════════════════════════════════════════════
 //  STATE & AUTH
 // ══════════════════════════════════════════════════════
@@ -1022,14 +789,14 @@ const S = {
   recentAns:[],
   diffHistory:[],
   pools:{},
-  usedQs:{easy:new Set(),mid:new Set(),hard:new Set()}
+  usedQs:{very_easy:new Set(),easy:new Set(),mid:new Set(),hard:new Set()}
 };
 const LEVEL_NAMES=['Very Easy','Easy','Medium','Hard','Very Hard'];
 const LEVEL_ICONS=['🌿','🌱','⚡','🔥','💀'];
 const LEVEL_COLORS=['#10d97e','#38bdf8','#fbbf24','#f97316','#ff4d6d'];
 const LEVEL_POINTS=[60,80,120,160,200];
-// Map 5 levels to 3 DB pools: 0,1→easy  2→mid  3,4→hard
-const LEVEL_TO_POOL=['easy','easy','mid','hard','hard'];
+// Map 5 levels to 4 DB pools: 0→very_easy 1→easy 2→mid 3,4→hard
+const LEVEL_TO_POOL=['very_easy','easy','mid','hard','hard'];
 
 function saveUsers(){ localStorage.setItem('ee_users',JSON.stringify(USERS)); }
 
@@ -1040,8 +807,8 @@ function show(id){
   el.style.display='block';
   requestAnimationFrame(()=>el.classList.add('active'));
   // Show sidebar only on quiz screen
-  const nav=document.getElementById('dot-nav');
-  if(nav) nav.style.display=(id==='s-quiz')?'grid':'none';
+  const sb=document.getElementById('quiz-sidebar');
+  if(sb) sb.style.display=(id==='s-quiz')?'flex':'none';
 }
 
 // ══════════════════════════════════════════════════════
@@ -1100,19 +867,17 @@ document.getElementById('btn-login').addEventListener('click',()=>{
 
 document.getElementById('btn-register').addEventListener('click',()=>{
   const n=document.getElementById('rg-name').value.trim();
-  const e=document.getElementById('rg-email').value.trim();
   const u=document.getElementById('rg-user').value.trim();
   const p=document.getElementById('rg-pass').value;
   let ok=true;
   ok=validate('rg-name','rg-name-err',n.length>=2,'Name must be at least 2 characters') && ok;
-  ok=validate('rg-email','rg-email-err',/^[^@]+@[^@]+\.[^@]+$/.test(e),'Enter a valid email') && ok;
   ok=validate('rg-user','rg-user-err',u.length>=3,'Username must be 3+ characters') && ok;
   ok=validate('rg-pass','rg-pass-err',p.length>=6,'Password must be at least 6 characters') && ok;
   if(!ok) return;
   const main=document.getElementById('rg-main-err');
   if(USERS[u]){ main.textContent='❌ Username already taken!'; main.style.display='block'; return; }
   main.style.display='none';
-  USERS[u]={pass:p,name:n,email:e,history:[],points:0,bestStreak:0};
+  USERS[u]={pass:p,name:n,history:[],points:0,bestStreak:0};
   saveUsers();
   CU=u;
   enterDashboard();
@@ -1252,9 +1017,9 @@ document.getElementById('btn-start-quiz').addEventListener('click',()=>{
 //  BUILD QUESTIONS — randomise correct position
 // ══════════════════════════════════════════════════════
 function buildQuestions(){
-  const POOLS=['easy','mid','hard'];
-  S.pools={easy:[],mid:[],hard:[]};
-  S.usedQs={easy:new Set(),mid:new Set(),hard:new Set()};
+  const POOLS=['very_easy','easy','mid','hard'];
+  S.pools={very_easy:[],easy:[],mid:[],hard:[]};
+  S.usedQs={very_easy:new Set(),easy:new Set(),mid:new Set(),hard:new Set()};
   S.exams.forEach(key=>{
     POOLS.forEach(d=>{
       (DB[key][d]||[]).forEach(q=>{
@@ -1395,20 +1160,10 @@ function showLevelToast(isUp){
 //  QUIZ
 // ══════════════════════════════════════════════════════
 function initQuiz(){
-  // dot nav
-  const dn=document.getElementById('dot-nav');
-  dn.innerHTML='';
-  for(let i=0;i<S.totalQs;i++){
-    const d=document.createElement('div');
-    d.className='dn-dot'; d.dataset.i=i;
-    d.textContent=i+1;
-    d.addEventListener('click',()=>jumpTo(i));
-    dn.appendChild(d);
-  }
   // exam pill
   document.getElementById('qh-exam').textContent=S.exams.map(k=>DB[k].icon+' '+DB[k].name).join(' · ');
   updateDiffBadge();
-  // Timer chip updated per question in loadQ
+  updateSidebar();
   loadQ();
 }
 
@@ -1441,12 +1196,6 @@ function loadQ(){
   const mn=document.getElementById('multi-note');
   mn.style.display=(q.multi)?'inline-flex':'none';
 
-  // progress
-  const pct=Math.round((S.idx/n)*100);
-  document.getElementById('prog-bar').style.width=pct+'%';
-  document.getElementById('pq-frac').textContent=(S.idx+1)+'/'+n;
-  document.getElementById('pq-pct').textContent=pct+'%';
-
   // score display
   document.getElementById('qs-pts').textContent=S.score;
   document.getElementById('hud-pts').textContent='⚡ '+S.score+' pts';
@@ -1464,18 +1213,17 @@ function loadQ(){
   if(S.ans[S.idx]!==null){
     const prev=S.ans[S.idx];
     if(prev.timedOut || prev.skipped){
-      // timed-out or skipped: show plain locked options, no answer reveal, no explanation
       renderOptsLocked(S.qs[S.idx], false);
       hideFeedback();
       hideExplain();
     } else {
-      // answered: show result with correct highlight + explanation
       renderOpts(S.qs[S.idx],true);
       showFeedback(prev);
       showExplain(S.qs[S.idx].e);
     }
     document.getElementById('btn-qnext').disabled=false;
     document.getElementById('btn-skip').disabled=true;
+    document.getElementById('btn-check').style.display='none';
     stopTimer();
   } else {
     renderOpts(q,false);
@@ -1483,6 +1231,8 @@ function loadQ(){
     hideExplain();
     document.getElementById('btn-qnext').disabled=true;
     document.getElementById('btn-skip').disabled=false;
+    document.getElementById('btn-check').style.display='';
+    document.getElementById('btn-check').disabled=true;
     startTimer();
   }
 }
@@ -1508,16 +1258,100 @@ function updateDiffBadge(){
   }
 }
 
-function updateDots(){
-  document.querySelectorAll('.dn-dot').forEach((d,i)=>{
-    d.className='dn-dot';
-    if(i===S.idx){ d.classList.add('cur'); d.textContent=i+1; return; }
-    const a=S.ans[i];
-    if(!a){ d.textContent=i+1; return; }
-    if(a.skipped){ d.classList.add('skip'); d.textContent='—'; }
-    else if(a.ok){ d.classList.add('ok'); d.textContent='✓'; }
-    else { d.classList.add('bad'); d.textContent='✗'; }
+function updateDots(){ updateSidebar(); }
+
+function updateSidebar(){
+  const answered=S.ans.filter(a=>a!==null);
+  const correct=answered.filter(a=>a&&a.ok).length;
+  const total=answered.length;
+  const accPct=total?Math.round((correct/total)*100):0;
+
+  // Stats
+  document.getElementById('sb-pts').textContent=S.score;
+  const accEl=document.getElementById('sb-acc');
+  accEl.textContent=accPct+'%';
+  accEl.className='sb-stat-val '+(accPct>=70?'acc-green':accPct>=40?'acc-amber':'acc-red');
+  document.getElementById('sb-streak').textContent=S.streak;
+
+  // Avg time
+  const times=S.timeTaken.filter(t=>t!=null);
+  const avgT=times.length?Math.round(times.reduce((a,b)=>a+b,0)/times.length):0;
+  document.getElementById('sb-avgtime').textContent=avgT+'s';
+
+  // Progress
+  const progPct=Math.round((total/S.totalQs)*100);
+  document.getElementById('sb-prog-ans').textContent=total+' answered';
+  document.getElementById('sb-prog-pct').textContent=progPct+'%';
+  document.getElementById('sb-prog-bar').style.width=progPct+'%';
+
+  // Question Sets — group into sets of 5, show per-question difficulty
+  const sets=[];
+  for(let i=0;i<S.totalQs;i+=5){
+    const chunk=[];
+    for(let j=i;j<Math.min(i+5,S.totalQs);j++) chunk.push(j);
+    const setCorrect=chunk.filter(j=>S.ans[j]&&S.ans[j].ok).length;
+    sets.push({start:i, indices:chunk, correct:setCorrect});
+  }
+
+  const qsetsEl=document.getElementById('sb-qsets');
+  qsetsEl.innerHTML=sets.map((set,si)=>{
+    const boxes=set.indices.map(j=>{
+      let cls='sb-qbox';
+      let txt=j+1;
+      const qLvl=S.diffHistory[j];
+      const hasLevel=(qLvl!=null);
+      let borderColor='';
+      if(j===S.idx){ cls+=' cur'; }
+      else if(S.ans[j]){
+        if(S.ans[j].skipped) { cls+=' skip'; txt='—'; }
+        else if(S.ans[j].ok) { cls+=' ok'; txt='✓'; }
+        else { cls+=' bad'; txt='✗'; }
+      }
+      if(hasLevel) borderColor='border-color:'+LEVEL_COLORS[qLvl];
+      return `<div class="${cls}" data-qi="${j}" style="${borderColor}">${txt}</div>`;
+    }).join('');
+    return `<div class="sb-qset">
+      <div class="sb-qset-header">
+        <div class="sb-qset-label">Set ${si+1}</div>
+        <div class="sb-qset-count">${set.correct}/${set.indices.length}</div>
+      </div>
+      <div class="sb-qset-grid">${boxes}</div>
+    </div>`;
+  }).join('');
+
+  // Click handlers for question boxes
+  qsetsEl.querySelectorAll('.sb-qbox').forEach(b=>{
+    b.addEventListener('click',()=>jumpTo(+b.dataset.qi));
   });
+
+  // Difficulty Journey
+  const jEl=document.getElementById('sb-journey');
+  // Group consecutive questions with same difficulty
+  const groups=[];
+  let curGroup=null;
+  for(let i=0;i<S.diffHistory.length;i++){
+    const lvl=S.diffHistory[i];
+    if(!curGroup||curGroup.level!==lvl){
+      curGroup={level:lvl, start:i+1, end:i+1, correct:0, total:0};
+      groups.push(curGroup);
+    } else {
+      curGroup.end=i+1;
+    }
+    curGroup.total++;
+    if(S.ans[i]&&S.ans[i].ok) curGroup.correct++;
+  }
+  jEl.innerHTML=groups.map((g,i)=>{
+    const color=LEVEL_COLORS[g.level];
+    const name=LEVEL_NAMES[g.level];
+    const icon=LEVEL_ICONS[g.level];
+    const pts=g.correct*LEVEL_POINTS[g.level];
+    return `<div class="sb-jrow">
+      <div class="sb-jrow-num">${i+1}</div>
+      <div class="sb-jrow-diff" style="color:${color}">${icon} ${name}</div>
+      <div class="sb-jrow-score">${g.correct}/${g.total} · ${pts}pts</div>
+    </div>`;
+  }).join('');
+  if(!jEl.innerHTML) jEl.innerHTML='<div style="font-size:.7rem;color:var(--sub)">Starting...</div>';
 }
 
 // ── Render Options ────────────────────────────────────
@@ -1567,18 +1401,23 @@ function selectOpt(i,btn,q){
       S.selectedOpts.add(i);
       btn.classList.add('sel');
     }
-    // enable next if at least one selected
-    document.getElementById('btn-qnext').disabled=(S.selectedOpts.size===0);
-    // provide a "Submit" cue (re-use Next button)
-    document.getElementById('btn-qnext').textContent='Submit ✓';
+    document.getElementById('btn-check').disabled=(S.selectedOpts.size===0);
   } else {
-    // single: immediate answer
+    // single: select only (don't auto-submit), highlight selected
+    document.querySelectorAll('#opts .opt').forEach(o=>o.classList.remove('sel'));
     S.selectedOpts=new Set([i]);
-    submitAnswer(q);
+    btn.classList.add('sel');
+    document.getElementById('btn-check').disabled=false;
   }
 }
 
-// For multi: Next/Submit triggers this
+// Check button — confirm selected answer
+document.getElementById('btn-check').addEventListener('click',()=>{
+  const q=S.qs[S.idx];
+  if(S.answered||S.selectedOpts.size===0) return;
+  submitAnswer(q);
+});
+
 function submitAnswer(q){
   if(S.answered) return;
   S.answered=true;
@@ -1610,6 +1449,7 @@ function submitAnswer(q){
   showExplain(q.e);
   document.getElementById('btn-qnext').disabled=false;
   document.getElementById('btn-skip').disabled=true;
+  document.getElementById('btn-check').style.display='none';
   const isLast=S.idx>=S.totalQs-1;
   document.getElementById('btn-qnext').textContent=isLast?'Finish ✓':'Next →';
   document.getElementById('qs-pts').textContent=S.score;
@@ -1631,6 +1471,7 @@ document.getElementById('btn-skip').addEventListener('click',()=>{
   renderOptsLocked(S.qs[S.idx], false);
   hideFeedback(); hideExplain();
   document.getElementById('btn-skip').disabled=true;
+  document.getElementById('btn-check').style.display='none';
   updateDots();
   // Auto-move to next
   setTimeout(()=>{
@@ -1646,11 +1487,6 @@ document.getElementById('btn-qback').addEventListener('click',()=>{
 });
 
 document.getElementById('btn-qnext').addEventListener('click',()=>{
-  const q=S.qs[S.idx];
-  // if multi and not yet answered, treat as submit
-  if(q.multi && !S.answered && S.selectedOpts.size>0){
-    submitAnswer(q); return;
-  }
   if(S.idx<S.totalQs-1){
     stopTimer();
     // Pick next question at current adaptive level if not yet picked
@@ -1658,6 +1494,14 @@ document.getElementById('btn-qnext').addEventListener('click',()=>{
     S.idx++;
     loadQ();
   } else finishQuiz();
+});
+
+// ── EXIT — confirm and return to dashboard ───────────
+document.getElementById('btn-exit').addEventListener('click',()=>{
+  if(!confirm('Are you sure you want to exit the quiz? Progress will be lost.')) return;
+  stopTimer();
+  show('s-dashboard');
+  renderDashboard();
 });
 
 // ── TIMER ─────────────────────────────────────────────
@@ -1704,6 +1548,8 @@ function autoTimeout(){
   checkLevelChange();
   // Lock options but DO NOT highlight correct answer
   renderOptsLocked(q, false);
+  document.getElementById('btn-check').style.display='none';
+  document.getElementById('btn-skip').disabled=true;
   updateDots();
   showFeedback(S.ans[S.idx],q,0);
   hideExplain();
@@ -2077,22 +1923,21 @@ function renderStats(){
   });
   if(!pg.children.length) pg.innerHTML='<div class="empty-state" style="grid-column:1/-1">No exam data yet</div>';
 
-  // leaderboard (all users sorted by points)
+  // leaderboard (current user only)
   const lb=document.getElementById('leaderboard');
-  const allUsers=Object.entries(USERS).map(([k,v])=>({key:k,name:v.name,pts:v.points||0,quizzes:v.history.length}));
-  allUsers.sort((a,b)=>b.pts-a.pts);
-  lb.innerHTML=allUsers.slice(0,6).map((u,i)=>{
-    const rankCls=i===0?'gold':i===1?'silver':i===2?'bronze':'';
-    const rankIco=i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1);
-    const isMe=u.key===CU?'style="border-color:var(--acc2)"':'';
-    return `<div class="lb-row" ${isMe}>
-      <div class="lb-rank ${rankCls}">${rankIco}</div>
-      <div class="lb-name">${u.name}${u.key===CU?' 👈':''}</div>
-      <div class="lb-score">${u.pts} pts</div>
-      <div class="lb-badge">${u.quizzes} quiz${u.quizzes!==1?'zes':''}</div>
+  const me=USERS[CU];
+  if(me){
+    const pts=me.points||0;
+    const quizzes=me.history.length;
+    lb.innerHTML=`<div class="lb-row" style="border-color:var(--acc2)">
+      <div class="lb-rank gold">🥇</div>
+      <div class="lb-name">${me.name}</div>
+      <div class="lb-score">${pts} pts</div>
+      <div class="lb-badge">${quizzes} quiz${quizzes!==1?'zes':''}</div>
     </div>`;
-  }).join('');
-  if(!lb.innerHTML) lb.innerHTML='<div class="empty-state">No data yet</div>';
+  } else {
+    lb.innerHTML='<div class="empty-state">No data yet</div>';
+  }
 
   // recent history
   renderHistory('stats-history', h.slice(-8).reverse());
