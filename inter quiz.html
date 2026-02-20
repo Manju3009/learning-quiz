@@ -80,6 +80,55 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .btn-check:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
 .btn-exit{background:transparent;color:var(--red);border:1.5px solid var(--red);padding:.75rem 1.2rem;font-size:.82rem}
 .btn-exit:hover{background:rgba(255,77,109,.1);transform:translateY(-1px)}
+
+/* Set Completion Overlay */
+.set-overlay{display:none;position:fixed;inset:0;z-index:1000;background:rgba(10,10,26,.92);backdrop-filter:blur(12px);align-items:center;justify-content:center}
+.set-overlay.show{display:flex}
+.set-card{background:var(--card);border:1.5px solid var(--b2);border-radius:20px;padding:2.5rem 2rem;max-width:520px;width:90%;text-align:center;animation:setSlideIn .5s ease}
+@keyframes setSlideIn{from{opacity:0;transform:translateY(30px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+.set-card h2{font-size:1.8rem;font-weight:800;margin-bottom:.5rem;background:linear-gradient(135deg,var(--acc),var(--acc3));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+.set-card .set-desc{color:var(--sub);font-size:.88rem;line-height:1.5;margin-bottom:1.5rem}
+.set-stats{display:flex;justify-content:center;gap:1.2rem;margin-bottom:1.5rem}
+.set-stat{background:var(--card2);border:1.5px solid var(--b2);border-radius:12px;padding:.8rem 1.2rem;min-width:90px}
+.set-stat-val{font-size:1.4rem;font-weight:800;font-family:'JetBrains Mono',monospace}
+.set-stat-val.green{color:var(--green)}.set-stat-val.amber{color:var(--amber)}.set-stat-val.red{color:var(--red)}
+.set-stat-lbl{font-size:.62rem;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-top:.2rem;font-weight:600}
+.set-quote{background:linear-gradient(135deg,rgba(91,106,240,.08),rgba(139,92,246,.08));border-left:3px solid var(--acc);border-radius:0 10px 10px 0;padding:1rem 1.2rem;margin-bottom:1.5rem;text-align:left}
+.set-quote q{font-style:italic;color:var(--text);font-size:.85rem;font-weight:500;line-height:1.5}
+.set-quote .set-quote-author{color:var(--muted);font-size:.72rem;margin-top:.3rem;display:block}
+.set-diff-flow{display:flex;align-items:center;justify-content:center;gap:.6rem;margin-bottom:1.5rem}
+.set-diff-badge{padding:.35rem .8rem;border-radius:20px;font-size:.72rem;font-weight:700;letter-spacing:.5px;border:1.5px solid}
+.set-diff-arrow{color:var(--muted);font-size:.8rem}
+.btn-continue{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:1rem 2.5rem;font-size:1rem;font-weight:700;border-radius:12px;border:none;cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(245,158,11,.3)}
+.btn-continue:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(245,158,11,.45)}
+
+/* History Review Overlay */
+.hist-overlay{display:none;position:fixed;inset:0;z-index:1000;background:rgba(10,10,26,.94);backdrop-filter:blur(12px);overflow-y:auto;padding:2rem 1rem}
+.hist-overlay.show{display:block}
+.hist-review{max-width:700px;margin:0 auto}
+.hist-review-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem}
+.hist-review-hdr h2{font-size:1.4rem;font-weight:800;color:var(--text)}
+.btn-close-hist{background:var(--card2);color:var(--sub);border:1.5px solid var(--b2);padding:.6rem 1.2rem;border-radius:10px;cursor:pointer;font-size:.82rem;font-weight:600;transition:all .2s}
+.btn-close-hist:hover{border-color:var(--red);color:var(--red)}
+.hist-summary{display:flex;gap:.8rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.hist-sum-box{background:var(--card);border:1.5px solid var(--b2);border-radius:10px;padding:.7rem 1rem;text-align:center;flex:1;min-width:80px}
+.hist-sum-val{font-size:1.1rem;font-weight:800;font-family:'JetBrains Mono',monospace}
+.hist-sum-lbl{font-size:.6rem;text-transform:uppercase;color:var(--muted);letter-spacing:.5px;margin-top:.15rem}
+.hist-q{background:var(--card);border:1.5px solid var(--b2);border-radius:12px;padding:1rem;margin-bottom:.8rem}
+.hist-q-top{display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;flex-wrap:wrap}
+.hist-q-num{font-size:.7rem;font-weight:700;color:var(--muted)}
+.hist-q-diff{padding:.15rem .5rem;border-radius:10px;font-size:.6rem;font-weight:700;border:1px solid}
+.hist-q-badge{padding:.15rem .5rem;border-radius:10px;font-size:.6rem;font-weight:700}
+.hist-q-badge.ok{background:rgba(16,217,126,.15);color:var(--green)}
+.hist-q-badge.bad{background:rgba(255,77,109,.15);color:var(--red)}
+.hist-q-badge.skip{background:rgba(148,163,184,.1);color:var(--muted)}
+.hist-q-text{font-size:.88rem;font-weight:600;color:var(--text);margin-bottom:.5rem;line-height:1.4}
+.hist-q-ans{font-size:.78rem;color:var(--sub);line-height:1.4}
+.hist-q-ans .ca{color:var(--green);font-weight:600}
+.hist-q-ans .wa{color:var(--red);font-weight:600}
+.hist-q-explain{margin-top:.5rem;padding:.6rem .8rem;background:rgba(91,106,240,.06);border-left:2px solid var(--acc);border-radius:0 8px 8px 0;font-size:.75rem;color:var(--sub);line-height:1.4}
+.hi-item-click{cursor:pointer;transition:border-color .2s}
+.hi-item-click:hover{border-color:var(--acc2)}
 .btn-danger{background:rgba(255,77,109,.12);color:var(--red);border:1.5px solid rgba(255,77,109,.3);padding:.8rem 1.4rem;font-size:.88rem}
 .btn-danger:hover{background:rgba(255,77,109,.22);border-color:var(--red)}
 .btn-full{width:100%}
@@ -374,6 +423,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .rv-explain{font-size:.76rem;color:var(--muted);line-height:1.55;border-top:1px solid var(--b1);padding-top:.4rem;margin-top:.3rem}
 
 /* result actions */
+.result-quote{background:linear-gradient(135deg,rgba(91,106,240,.08),rgba(139,92,246,.08));border-left:3px solid var(--acc);border-radius:0 12px 12px 0;padding:1.2rem 1.5rem;margin-top:1.5rem;text-align:left}
+.result-quote q{font-style:italic;color:var(--text);font-size:.92rem;font-weight:500;line-height:1.6;display:block}
+.result-quote .rq-author{color:var(--muted);font-size:.75rem;margin-top:.4rem;display:block}
 .r-actions{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:1.5rem}
 .r-actions .ra-full{grid-column:1/-1}
 .ra-btn{
@@ -717,6 +769,37 @@ user-select:none;
       </div>
     </div>
 
+    <!-- History Review Overlay -->
+    <div class="hist-overlay" id="hist-overlay">
+      <div class="hist-review">
+        <div class="hist-review-hdr">
+          <h2 id="hist-review-title">Quiz Review</h2>
+          <button class="btn-close-hist" id="btn-close-hist">✕ Close</button>
+        </div>
+        <div class="hist-summary" id="hist-summary"></div>
+        <div id="hist-questions"></div>
+      </div>
+    </div>
+
+    <!-- Set Completion Overlay -->
+    <div class="set-overlay" id="set-overlay">
+      <div class="set-card">
+        <h2 id="set-title">Charging Up!</h2>
+        <p class="set-desc" id="set-desc">Each question you attempt builds your mental database.</p>
+        <div class="set-stats">
+          <div class="set-stat"><div class="set-stat-val green" id="set-correct">0/5</div><div class="set-stat-lbl">Correct</div></div>
+          <div class="set-stat"><div class="set-stat-val amber" id="set-pts">0</div><div class="set-stat-lbl">Points</div></div>
+          <div class="set-stat"><div class="set-stat-val" id="set-acc">0%</div><div class="set-stat-lbl">Accuracy</div></div>
+        </div>
+        <div class="set-quote" id="set-quote-box">
+          <q id="set-quote-text">Progress is the goal.</q>
+          <span class="set-quote-author" id="set-quote-author">— Unknown</span>
+        </div>
+        <div class="set-diff-flow" id="set-diff-flow"></div>
+        <button class="btn-continue" id="btn-continue">Continue Next Set →</button>
+      </div>
+    </div>
+
     <!-- ═══════════════════════════════════
          S4 — RESULTS
     ═══════════════════════════════════ -->
@@ -755,6 +838,10 @@ user-select:none;
         <div class="bd-list" id="bd-list"></div>
         <div class="review-hdr" id="rv-hdr"><span class="rh-ttl">📝 Answer Review</span><span class="rh-ico">▼</span></div>
         <div class="review-items" id="rv-items"></div>
+        <div class="result-quote" id="result-quote">
+          <q id="rq-text"></q>
+          <span class="rq-author" id="rq-author"></span>
+        </div>
         <div class="r-actions">
           <button class="ra-btn ra-ghost" id="ra-retry">🔁 Retry</button>
           <button class="ra-btn ra-ghost" id="ra-newsetup">⚙️ New Setup</button>
@@ -922,9 +1009,10 @@ function renderDashboard(){
 function renderHistory(elId, list){
   const el=document.getElementById(elId);
   if(!list.length){ el.innerHTML='<div class="empty-state">📭 No quizzes yet!</div>'; return; }
-  el.innerHTML=list.map(h=>{
+  el.innerHTML=list.map((h,i)=>{
     const cls=h.acc>=80?'good':h.acc>=50?'avg':'poor';
-    return `<div class="hist-item">
+    const clickable=h.questions?'hi-item-click':'';
+    return `<div class="hist-item ${clickable}" data-hist-idx="${i}">
       <div class="hi-icon">${DB[h.exam]?.icon||'📚'}</div>
       <div class="hi-info">
         <div class="hi-name">${DB[h.exam]?.name||h.exam} — ${h.diff} (${h.count} Qs)</div>
@@ -933,7 +1021,73 @@ function renderHistory(elId, list){
       <div class="hi-score ${cls}">${h.acc}%</div>
     </div>`;
   }).join('');
+  // Click to review
+  el.querySelectorAll('.hi-item-click').forEach(item=>{
+    item.addEventListener('click',()=>{
+      const idx=+item.dataset.histIdx;
+      showHistReview(list[idx]);
+    });
+  });
 }
+
+function showHistReview(rec){
+  if(!rec.questions||!rec.answers) return;
+  const overlay=document.getElementById('hist-overlay');
+  const examName=DB[rec.exam]?.name||rec.exam;
+  document.getElementById('hist-review-title').textContent=examName+' — '+rec.date;
+
+  // Summary stats
+  const accCol=rec.acc>=70?'var(--green)':rec.acc>=40?'var(--amber)':'var(--red)';
+  document.getElementById('hist-summary').innerHTML=`
+    <div class="hist-sum-box"><div class="hist-sum-val" style="color:var(--green)">${rec.correct}/${rec.count}</div><div class="hist-sum-lbl">Correct</div></div>
+    <div class="hist-sum-box"><div class="hist-sum-val" style="color:var(--amber)">${rec.pts}</div><div class="hist-sum-lbl">Points</div></div>
+    <div class="hist-sum-box"><div class="hist-sum-val" style="color:${accCol}">${rec.acc}%</div><div class="hist-sum-lbl">Accuracy</div></div>
+    <div class="hist-sum-box"><div class="hist-sum-val" style="color:var(--red)">${rec.skipped||0}</div><div class="hist-sum-lbl">Skipped</div></div>`;
+
+  // Questions
+  const qEl=document.getElementById('hist-questions');
+  qEl.innerHTML=rec.questions.map((q,i)=>{
+    const a=rec.answers[i];
+    if(!a) return '';
+    const lvl=q._diff!=null?q._diff:(rec.diffHistory?rec.diffHistory[i]:1);
+    const diffName=LEVEL_NAMES[lvl]||'Easy';
+    const diffColor=LEVEL_COLORS[lvl]||'#38bdf8';
+    const isTimeout=a.timedOut;
+    let badgeCls,badgeTxt;
+    if(a.ok){badgeCls='ok';badgeTxt='✓ Correct';}
+    else if(a.skipped){badgeCls='skip';badgeTxt='⚡ Skipped';}
+    else if(isTimeout){badgeCls='skip';badgeTxt='⏱ Timed Out';}
+    else{badgeCls='bad';badgeTxt='✗ Wrong';}
+
+    let ansLine='';
+    if(a.skipped||isTimeout){
+      ansLine=isTimeout?'<span style="color:var(--amber)">Time ran out</span>':'<span style="color:var(--muted)">Skipped</span>';
+    } else if(a.ok){
+      ansLine='Your answer: <span class="ca">'+a.selected.map(si=>q.o[si]).join(' / ')+'</span>';
+    } else {
+      ansLine='Your: <span class="wa">'+(a.selected.length?a.selected.map(si=>q.o[si]).join(' / '):'—')+'</span> → Correct: <span class="ca">'+a.correct.map(ci=>q.o[ci]).join(' / ')+'</span>';
+    }
+
+    const explainHtml=(a.ok||(!a.skipped&&!isTimeout))?'<div class="hist-q-explain">💡 '+q.e+'</div>':'';
+
+    return '<div class="hist-q">'+
+      '<div class="hist-q-top">'+
+        '<span class="hist-q-num">Q'+(i+1)+'</span>'+
+        '<span class="hist-q-diff" style="color:'+diffColor+';border-color:'+diffColor+'">'+diffName+'</span>'+
+        '<span class="hist-q-badge '+badgeCls+'">'+badgeTxt+'</span>'+
+      '</div>'+
+      '<div class="hist-q-text">'+q.q+'</div>'+
+      '<div class="hist-q-ans">'+ansLine+'</div>'+
+      explainHtml+
+    '</div>';
+  }).join('');
+
+  overlay.classList.add('show');
+}
+
+document.getElementById('btn-close-hist').addEventListener('click',()=>{
+  document.getElementById('hist-overlay').classList.remove('show');
+});
 
 // ── TAB NAVIGATION ───────────────────────────────────
 document.getElementById('main-tabs').addEventListener('click',e=>{
@@ -1473,10 +1627,13 @@ document.getElementById('btn-skip').addEventListener('click',()=>{
   document.getElementById('btn-skip').disabled=true;
   document.getElementById('btn-check').style.display='none';
   updateDots();
-  // Auto-move to next
+  // Auto-move to next (show set overlay at set boundary)
   setTimeout(()=>{
-    if(S.idx<S.totalQs-1){ pickNextQ(); S.idx++; loadQ(); }
-    else finishQuiz();
+    if((S.idx+1)%5===0 && S.idx<S.totalQs-1){
+      showSetOverlay();
+    } else if(S.idx<S.totalQs-1){
+      pickNextQ(); S.idx++; loadQ();
+    } else finishQuiz();
   },200);
 });
 
@@ -1489,11 +1646,101 @@ document.getElementById('btn-qback').addEventListener('click',()=>{
 document.getElementById('btn-qnext').addEventListener('click',()=>{
   if(S.idx<S.totalQs-1){
     stopTimer();
-    // Pick next question at current adaptive level if not yet picked
-    pickNextQ();
-    S.idx++;
-    loadQ();
+    // Check if this is the last question in a set of 5 (show set overlay)
+    if((S.idx+1)%5===0 && S.ans[S.idx]!==null){
+      showSetOverlay();
+    } else {
+      pickNextQ(); S.idx++; loadQ();
+    }
   } else finishQuiz();
+});
+
+// ── SET COMPLETION OVERLAY ───────────────────────────
+const SET_TITLES=[
+  {title:'Charging Up!',desc:'Each question you attempt builds your mental database. You\'re training your brain like an athlete trains their body!'},
+  {title:'Warming Up!',desc:'Your brain is getting into the zone. The more you practice, the sharper you become!'},
+  {title:'Building Momentum!',desc:'You\'re stacking knowledge brick by brick. Every answer strengthens your foundation!'},
+  {title:'Powering Through!',desc:'Mental stamina is your superpower. Keep pushing your limits!'},
+  {title:'Leveling Up!',desc:'You\'re evolving with every question. Champions are made through consistent effort!'},
+  {title:'Rising Strong!',desc:'Every challenge you face makes you stronger. Keep climbing!'},
+  {title:'Knowledge Unlocked!',desc:'Your brain just grew a little bigger. Keep feeding it with more questions!'},
+  {title:'Brain Boost!',desc:'Neurons are firing on all cylinders. You\'re in the learning zone!'},
+  {title:'On A Roll!',desc:'Success is the sum of small efforts repeated consistently. You\'re proving it!'},
+  {title:'Milestone Reached!',desc:'Every set completed is a step closer to mastery. You\'re doing amazing!'},
+];
+
+const SET_QUOTES=[
+  {text:'It\'s okay to be a work in progress. Progress is the goal.',author:'Unknown'},
+  {text:'The expert in anything was once a beginner.',author:'Helen Hayes'},
+  {text:'Education is the most powerful weapon to change the world.',author:'Nelson Mandela'},
+  {text:'The beautiful thing about learning is that no one can take it away from you.',author:'B.B. King'},
+  {text:'Success is not final, failure is not fatal: it is the courage to continue that counts.',author:'Winston Churchill'},
+  {text:'The only way to do great work is to love what you do.',author:'Steve Jobs'},
+  {text:'Knowledge is power. Information is liberating.',author:'Kofi Annan'},
+  {text:'Live as if you were to die tomorrow. Learn as if you were to live forever.',author:'Mahatma Gandhi'},
+  {text:'The mind is not a vessel to be filled, but a fire to be kindled.',author:'Plutarch'},
+  {text:'An investment in knowledge pays the best interest.',author:'Benjamin Franklin'},
+  {text:'The roots of education are bitter, but the fruit is sweet.',author:'Aristotle'},
+  {text:'Tell me and I forget, teach me and I remember, involve me and I learn.',author:'Benjamin Franklin'},
+  {text:'The more that you read, the more things you will know.',author:'Dr. Seuss'},
+  {text:'Intelligence plus character — that is the goal of true education.',author:'Martin Luther King Jr.'},
+  {text:'Learning never exhausts the mind.',author:'Leonardo da Vinci'},
+];
+
+function showSetOverlay(){
+  const setNum=Math.floor(S.idx/5);
+  const start=setNum*5;
+  const end=Math.min(start+5,S.totalQs);
+
+  // Calculate set stats
+  let setCorrect=0, setPts=0;
+  for(let i=start;i<end;i++){
+    if(S.ans[i]&&S.ans[i].ok){ setCorrect++; setPts+=S.ans[i].pts; }
+  }
+  const setTotal=end-start;
+  const setAcc=Math.round((setCorrect/setTotal)*100);
+
+  // Pick motivational content
+  const ti=SET_TITLES[setNum%SET_TITLES.length];
+  const qi=SET_QUOTES[Math.floor(Math.random()*SET_QUOTES.length)];
+
+  document.getElementById('set-title').textContent=ti.title;
+  document.getElementById('set-desc').textContent=ti.desc;
+  document.getElementById('set-correct').textContent=setCorrect+'/'+setTotal;
+  document.getElementById('set-pts').textContent=setPts;
+  const accEl=document.getElementById('set-acc');
+  accEl.textContent=setAcc+'%';
+  accEl.className='set-stat-val '+(setAcc>=70?'green':setAcc>=40?'amber':'red');
+
+  document.getElementById('set-quote-text').textContent=qi.text;
+  document.getElementById('set-quote-author').textContent='— '+qi.author;
+
+  // Difficulty flow: show start → current level for this set
+  const startLvl=S.diffHistory[start]!=null?S.diffHistory[start]:S.level;
+  const endLvl=S.level;
+  const flow=document.getElementById('set-diff-flow');
+  if(startLvl!==endLvl){
+    flow.innerHTML=`<span class="set-diff-badge" style="color:${LEVEL_COLORS[startLvl]};border-color:${LEVEL_COLORS[startLvl]}">${LEVEL_NAMES[startLvl].toUpperCase()}</span>
+      <span class="set-diff-arrow">→</span>
+      <span class="set-diff-badge" style="color:${LEVEL_COLORS[endLvl]};border-color:${LEVEL_COLORS[endLvl]}">${LEVEL_NAMES[endLvl].toUpperCase()}</span>`;
+  } else {
+    flow.innerHTML=`<span class="set-diff-badge" style="color:${LEVEL_COLORS[endLvl]};border-color:${LEVEL_COLORS[endLvl]}">● ${LEVEL_NAMES[endLvl].toUpperCase()}</span>`;
+  }
+
+  // Update continue button text for last set
+  const isLastSet=(S.idx>=S.totalQs-1);
+  document.getElementById('btn-continue').textContent=isLastSet?'View Results →':'Continue Next Set →';
+
+  document.getElementById('set-overlay').classList.add('show');
+}
+
+document.getElementById('btn-continue').addEventListener('click',()=>{
+  document.getElementById('set-overlay').classList.remove('show');
+  if(S.idx>=S.totalQs-1){
+    finishQuiz();
+  } else {
+    pickNextQ(); S.idx++; loadQ();
+  }
 });
 
 // ── EXIT — confirm and return to dashboard ───────────
@@ -1559,6 +1806,7 @@ function autoTimeout(){
   setTimeout(()=>{
     document.getElementById('timer-box').style.background='';
     if(isLast){ finishQuiz(); }
+    else if((S.idx+1)%5===0){ showSetOverlay(); }
     else { pickNextQ(); S.idx++; loadQ(); }
   },1500);
 }
@@ -1618,14 +1866,27 @@ function hideExplain(){ document.getElementById('explain-box').classList.remove(
 function showStreakToast(n){
   const t=document.getElementById('streak-toast');
   const msgs=[
-    '','',' Keep it up!',
-    ' You\'re on fire!',  // 3
-    ' Incredible!',       // 4
-    ' Unstoppable!',      // 5
-    ' Legendary!',        // 6
-    ' God mode!',         // 7+
+    '','',' Nice start!',        // 2
+    ' Keep it up!',              // 3
+    ' You\'re on fire!',         // 4
+    ' Brilliant mind!',          // 5
+    ' Unstoppable force!',       // 6
+    ' Absolute beast!',          // 7
+    ' Genius level!',            // 8
+    ' You\'re a machine!',       // 9
+    ' Perfect 10! Flawless!',    // 10
+    ' Beyond amazing!',          // 11
+    ' Einstein who?!',           // 12
+    ' Record breaker!',          // 13
+    ' Hall of fame!',            // 14
+    ' Legendary status!',        // 15
+    ' One in a million!',        // 16
+    ' Unreal talent!',           // 17
+    ' God mode activated!',      // 18
+    ' Supreme champion!',        // 19
+    ' The GOAT! Untouchable!',   // 20+
   ];
-  const msg=msgs[Math.min(n,7)]||'';
+  const msg=msgs[Math.min(n,20)]||'';
   document.getElementById('stk-msg').textContent=n+'× Streak! 🔥'+msg;
   t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2200);
@@ -1657,7 +1918,11 @@ function finishQuiz(){
     diff:S.diff, count:n, correct:cor, wrong:wrg, skipped:skp,
     acc, pts:S.score,
     date:new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}),
-    perExam:{}
+    perExam:{},
+    // Save questions & answers for review
+    questions:S.qs.map(q=>({q:q.q,o:q.o,c:q.c,e:q.e,examKey:q.examKey,_diff:q._diff})),
+    answers:S.ans.map(a=>a?{ok:a.ok,selected:a.selected,correct:a.correct,pts:a.pts,skipped:a.skipped,timedOut:a.timedOut}:null),
+    diffHistory:[...S.diffHistory]
   };
   // per-exam breakdown
   S.exams.forEach(k=>{
@@ -1874,6 +2139,33 @@ function showResults(cor,wrg,skp,acc){
   // review toggle
   document.getElementById('rv-hdr').classList.remove('open');
   rvItems.classList.remove('open');
+
+  // Motivational quote on results page
+  const RESULT_QUOTES=[
+    {text:'Live as if you were to die tomorrow. Learn as if you were to live forever.',author:'Mahatma Gandhi'},
+    {text:'The expert in anything was once a beginner.',author:'Helen Hayes'},
+    {text:'Education is the most powerful weapon which you can use to change the world.',author:'Nelson Mandela'},
+    {text:'The beautiful thing about learning is that no one can take it away from you.',author:'B.B. King'},
+    {text:'Success is not final, failure is not fatal: it is the courage to continue that counts.',author:'Winston Churchill'},
+    {text:'The only way to do great work is to love what you do.',author:'Steve Jobs'},
+    {text:'Knowledge is power. Information is liberating.',author:'Kofi Annan'},
+    {text:'The mind is not a vessel to be filled, but a fire to be kindled.',author:'Plutarch'},
+    {text:'An investment in knowledge pays the best interest.',author:'Benjamin Franklin'},
+    {text:'The roots of education are bitter, but the fruit is sweet.',author:'Aristotle'},
+    {text:'Tell me and I forget, teach me and I remember, involve me and I learn.',author:'Benjamin Franklin'},
+    {text:'Intelligence plus character — that is the goal of true education.',author:'Martin Luther King Jr.'},
+    {text:'Learning never exhausts the mind.',author:'Leonardo da Vinci'},
+    {text:'The more that you read, the more things you will know. The more that you learn, the more places you\'ll go.',author:'Dr. Seuss'},
+    {text:'It does not matter how slowly you go as long as you do not stop.',author:'Confucius'},
+    {text:'Believe you can and you\'re halfway there.',author:'Theodore Roosevelt'},
+    {text:'The secret of getting ahead is getting started.',author:'Mark Twain'},
+    {text:'What we learn with pleasure we never forget.',author:'Alfred Mercier'},
+    {text:'The capacity to learn is a gift; the ability to learn is a skill; the willingness to learn is a choice.',author:'Brian Herbert'},
+    {text:'Every accomplishment starts with the decision to try.',author:'John F. Kennedy'},
+  ];
+  const rq=RESULT_QUOTES[Math.floor(Math.random()*RESULT_QUOTES.length)];
+  document.getElementById('rq-text').textContent=rq.text;
+  document.getElementById('rq-author').textContent='— '+rq.author;
 
   if(acc>=70) spawnConfetti();
   show('s-result');
