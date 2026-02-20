@@ -780,6 +780,21 @@ user-select:none;
       </div>
     </div>
 
+    <!-- Skip Dialog -->
+    <div class="set-overlay" id="skip-dialog">
+      <div class="set-card">
+        <h2 style="background:none;-webkit-text-fill-color:var(--amber);color:var(--amber)">⚠️ Skipped Questions</h2>
+        <p class="set-desc" id="skip-msg">You have skipped 3 questions. Would you like to go back and answer them?</p>
+        <div class="set-stats">
+          <div class="set-stat"><div class="set-stat-val amber" id="skip-count">3</div><div class="set-stat-lbl">Skipped</div></div>
+        </div>
+        <div style="display:flex;gap:.8rem;justify-content:center;margin-top:1rem">
+          <button class="btn-continue" id="btn-skip-attend" style="background:linear-gradient(135deg,#10d97e,#0eb86e)">✓ Answer Them</button>
+          <button class="btn-continue" id="btn-skip-finish" style="background:linear-gradient(135deg,#f97316,#dc2626)">✗ Skip & Finish</button>
+        </div>
+      </div>
+    </div>
+
     <!-- History Review Overlay -->
     <div class="hist-overlay" id="hist-overlay">
       <div class="hist-review">
@@ -1620,8 +1635,13 @@ function submitAnswer(q){
   document.getElementById('btn-qnext').disabled=false;
   document.getElementById('btn-skip').disabled=true;
   document.getElementById('btn-check').style.display='none';
-  const isLast=S.idx>=S.totalQs-1;
-  document.getElementById('btn-qnext').textContent=isLast?'Finish ✓':'Next →';
+  if(S._attendingSkipped){
+    const remaining=S._skipQueue?S._skipQueue.length:0;
+    document.getElementById('btn-qnext').textContent=remaining>0?'Next Skipped →':'Finish ✓';
+  } else {
+    const isLast=S.idx>=S.totalQs-1;
+    document.getElementById('btn-qnext').textContent=isLast?'Finish ✓':'Next →';
+  }
   document.getElementById('qs-pts').textContent=S.score;
   document.getElementById('hud-pts').textContent='⚡ '+S.score+' pts';
   updateDots();
@@ -1660,6 +1680,12 @@ document.getElementById('btn-qback').addEventListener('click',()=>{
 });
 
 document.getElementById('btn-qnext').addEventListener('click',()=>{
+  // If attending skipped questions, jump to next skipped
+  if(S._attendingSkipped){
+    stopTimer();
+    goToNextSkipped();
+    return;
+  }
   if(S.idx<S.totalQs-1){
     stopTimer();
     // Check if this is the last question in a set of 5 (show set overlay)
@@ -1916,6 +1942,65 @@ function showStreakToast(n){
 // ══════════════════════════════════════════════════════
 function finishQuiz(){
   stopTimer();
+  // Check for skipped questions — ask user to revisit
+  const skippedIndices=[];
+  for(let i=0;i<S.qs.length;i++){
+    if(S.ans[i]&&S.ans[i].skipped) skippedIndices.push(i);
+  }
+  if(skippedIndices.length>0 && !S._skipConfirmed){
+    showSkipDialog(skippedIndices);
+    return;
+  }
+  S._skipConfirmed=false;
+  actuallyFinishQuiz();
+}
+
+function showSkipDialog(skippedIndices){
+  document.getElementById('skip-count').textContent=skippedIndices.length;
+  document.getElementById('skip-msg').textContent=
+    'You have skipped '+skippedIndices.length+' question'+(skippedIndices.length>1?'s':'')+'. Would you like to go back and answer them?';
+  document.getElementById('skip-dialog').classList.add('show');
+
+  // Store for handlers
+  S._skippedIndices=skippedIndices;
+}
+
+document.getElementById('btn-skip-attend').addEventListener('click',()=>{
+  document.getElementById('skip-dialog').classList.remove('show');
+  // Enter attending-skipped mode
+  S._attendingSkipped=true;
+  S._skipQueue=[...S._skippedIndices];
+  goToNextSkipped();
+});
+
+function goToNextSkipped(){
+  if(!S._skipQueue||!S._skipQueue.length){
+    // All skipped answered — restore buttons and finish
+    S._attendingSkipped=false;
+    S._skipConfirmed=true;
+    document.getElementById('btn-qback').style.display='';
+    document.getElementById('btn-skip').style.display='';
+    finishQuiz();
+    return;
+  }
+  const idx=S._skipQueue.shift();
+  // Reset so user can answer
+  S.ans[idx]=null;
+  S.idx=idx;
+  // Hide back/skip in attending mode
+  document.getElementById('btn-qback').style.display='none';
+  document.getElementById('btn-skip').style.display='none';
+  loadQ();
+  startTimer();
+}
+
+document.getElementById('btn-skip-finish').addEventListener('click',()=>{
+  document.getElementById('skip-dialog').classList.remove('show');
+  S._skipConfirmed=true;
+  finishQuiz();
+});
+
+function actuallyFinishQuiz(){
   // fill any unanswered
   S.qs.forEach((_,i)=>{
     if(!S.ans[i]) S.ans[i]={ok:false,selected:[],correct:S.qs[i].c,pts:0,skipped:true};
