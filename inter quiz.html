@@ -370,7 +370,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .rh-sub{font-size:.84rem;color:var(--sub)}
 
 /* ring */
+.result-score-row{display:flex;align-items:center;justify-content:center;gap:2rem;flex-wrap:wrap;margin:.5rem 0}
 .ring-wrap{position:relative;display:inline-block;margin:1rem 0}
+.grade-wrap{text-align:center}
+.grade-circle{width:120px;height:120px;border-radius:50%;border:3px solid var(--acc2);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto .6rem}
+.grade-letter{font-size:2.4rem;font-weight:900;font-family:'JetBrains Mono',monospace;line-height:1}
+.grade-label{font-size:.6rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:600;margin-top:.15rem}
+.grade-score{font-size:1rem;font-weight:700;color:var(--text)}
 .ring-svg{transform:rotate(-90deg);filter:drop-shadow(0 0 16px rgba(91,106,240,.35))}
 .ring-bg{fill:none;stroke:var(--card2);stroke-width:11}
 .ring-fg{fill:none;stroke-width:11;stroke-linecap:round;transition:stroke-dashoffset 1.5s cubic-bezier(.4,0,.2,1)}
@@ -564,6 +570,11 @@ user-select:none;
               <div class="field-error" id="rg-name-err">Name must be at least 2 characters</div>
             </div>
             <div class="field">
+              <label>Email Address</label>
+              <input type="email" id="rg-email" placeholder="your@email.com" autocomplete="email"/>
+              <div class="field-error" id="rg-email-err">Please enter a valid email</div>
+            </div>
+            <div class="field">
               <label>Username</label>
               <input type="text" id="rg-user" placeholder="Choose a username" autocomplete="username"/>
               <div class="field-error" id="rg-user-err">Username must be 3+ characters</div>
@@ -646,7 +657,6 @@ user-select:none;
 
         <div class="btn-row">
           <button class="btn btn-primary" id="btn-start-quiz" disabled>🚀 Start Quiz</button>
-          <button class="btn btn-outline" id="btn-reset-setup">Reset</button>
         </div>
       </div>
 
@@ -810,14 +820,23 @@ user-select:none;
           <div class="rh-emoji" id="rh-emoji">🎉</div>
           <div class="rh-title"><em id="rh-title">Well Done!</em></div>
           <div class="rh-sub" id="rh-sub">Here's how you performed</div>
-          <div class="ring-wrap">
-            <svg class="ring-svg" width="148" height="148" viewBox="0 0 148 148">
-              <circle class="ring-bg" cx="74" cy="74" r="60"/>
-              <circle class="ring-fg" id="ring-fg" cx="74" cy="74" r="60" stroke-dasharray="376.99" stroke-dashoffset="376.99"/>
-            </svg>
-            <div class="ring-center">
-              <div class="ring-pct" id="ring-pct">0%</div>
-              <div class="ring-lbl">accuracy</div>
+          <div class="result-score-row">
+            <div class="ring-wrap">
+              <svg class="ring-svg" width="148" height="148" viewBox="0 0 148 148">
+                <circle class="ring-bg" cx="74" cy="74" r="60"/>
+                <circle class="ring-fg" id="ring-fg" cx="74" cy="74" r="60" stroke-dasharray="376.99" stroke-dashoffset="376.99"/>
+              </svg>
+              <div class="ring-center">
+                <div class="ring-pct" id="ring-pct">0%</div>
+                <div class="ring-lbl">accuracy</div>
+              </div>
+            </div>
+            <div class="grade-wrap">
+              <div class="grade-circle" id="grade-circle">
+                <div class="grade-letter" id="grade-letter">B</div>
+                <div class="grade-label">Grade</div>
+              </div>
+              <div class="grade-score" id="grade-score">8/15 Correct</div>
             </div>
           </div>
         </div>
@@ -955,17 +974,19 @@ document.getElementById('btn-login').addEventListener('click',()=>{
 
 document.getElementById('btn-register').addEventListener('click',()=>{
   const n=document.getElementById('rg-name').value.trim();
+  const em=document.getElementById('rg-email').value.trim();
   const u=document.getElementById('rg-user').value.trim();
   const p=document.getElementById('rg-pass').value;
   let ok=true;
   ok=validate('rg-name','rg-name-err',n.length>=2,'Name must be at least 2 characters') && ok;
+  ok=validate('rg-email','rg-email-err',/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em),'Please enter a valid email') && ok;
   ok=validate('rg-user','rg-user-err',u.length>=3,'Username must be 3+ characters') && ok;
   ok=validate('rg-pass','rg-pass-err',p.length>=6,'Password must be at least 6 characters') && ok;
   if(!ok) return;
   const main=document.getElementById('rg-main-err');
   if(USERS[u]){ main.textContent='❌ Username already taken!'; main.style.display='block'; return; }
   main.style.display='none';
-  USERS[u]={pass:p,name:n,history:[],points:0,bestStreak:0};
+  USERS[u]={pass:p,name:n,email:em,history:[],points:0,bestStreak:0};
   saveUsers();
   CU=u;
   enterDashboard();
@@ -1154,13 +1175,6 @@ function updatePreview(){
     ? 'Up to 15 per category ('+maxAvail+' available)'
     : 'Up to 15 per category';
 }
-
-document.getElementById('btn-reset-setup').addEventListener('click',()=>{
-  S.exams=[];
-  document.querySelectorAll('.exam-card').forEach(c=>c.classList.remove('selected'));
-  document.getElementById('btn-start-quiz').disabled=true;
-  updatePreview();
-});
 
 document.getElementById('btn-start-quiz').addEventListener('click',()=>{
   buildQuestions();
@@ -1734,6 +1748,9 @@ function showSetOverlay(){
   document.getElementById('btn-continue').textContent=isLastSet?'View Results →':'Continue Next Set →';
 
   document.getElementById('set-overlay').classList.add('show');
+
+  // Confetti for good set performance (4/5 or 5/5)
+  if(setCorrect>=4) spawnConfetti();
 }
 
 document.getElementById('btn-continue').addEventListener('click',()=>{
@@ -2063,6 +2080,23 @@ function showResults(cor,wrg,skp,acc){
   document.getElementById('rh-sub').textContent=sub;
   document.getElementById('ring-pct').textContent=acc+'%';
   document.getElementById('acc-txt').textContent=acc+'%';
+
+  // Grade
+  let grade,gradeColor;
+  if(acc===100){grade='A+';gradeColor='#10d97e';}
+  else if(acc>=90){grade='A';gradeColor='#10d97e';}
+  else if(acc>=80){grade='B+';gradeColor='#38bdf8';}
+  else if(acc>=70){grade='B';gradeColor='#38bdf8';}
+  else if(acc>=60){grade='C+';gradeColor='#fbbf24';}
+  else if(acc>=50){grade='C';gradeColor='#fbbf24';}
+  else if(acc>=40){grade='D';gradeColor='#f97316';}
+  else{grade='F';gradeColor='#ff4d6d';}
+  document.getElementById('grade-letter').textContent=grade;
+  document.getElementById('grade-letter').style.color=gradeColor;
+  document.getElementById('grade-circle').style.borderColor=gradeColor;
+  const n=S.qs.length;
+  document.getElementById('grade-score').textContent=cor+'/'+n+' Correct';
+
   document.getElementById('r-cor').textContent=cor;
   document.getElementById('r-wrg').textContent=wrg;
   document.getElementById('r-skp').textContent=skp;
